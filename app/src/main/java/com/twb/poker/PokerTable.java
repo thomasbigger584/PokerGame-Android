@@ -3,6 +3,7 @@ package com.twb.poker;
 import com.twb.poker.domain.PlayerBank;
 import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.layout.CardPairLayout;
+import com.twb.poker.layout.CommunityCardLayout;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -10,7 +11,14 @@ import java.util.Random;
 public class PokerTable extends ArrayList<PokerPlayer> {
     private static final int NO_DEALER = -1;
 
-    public void addPlayer(CardPairLayout cardPairLayout, String displayName, double funds, boolean currentPlayer) {
+    private CommunityCardLayout communityCardLayout;
+
+    public PokerTable(CommunityCardLayout communityCardLayout) {
+        this.communityCardLayout = communityCardLayout;
+    }
+
+    public void addPlayer(CardPairLayout cardPairLayout, String displayName,
+                          double funds, boolean currentPlayer) {
         PlayerBank playerBank = new PlayerBank(funds);
         PlayerUser playerUser = new PlayerUser(displayName, playerBank);
         PokerPlayer pokerPlayer = new PokerPlayer(cardPairLayout, playerUser, currentPlayer);
@@ -35,7 +43,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         //take the next player along for dealing
         dealerIndex++;
 
-        PokerTable pokerTable = new PokerTable();
+        PokerTable pokerTable = new PokerTable(communityCardLayout);
         for (int playerIndex = dealerIndex; playerIndex < size(); playerIndex++) {
             pokerTable.add(get(playerIndex));
         }

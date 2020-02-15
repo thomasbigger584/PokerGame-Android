@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.twb.poker.layout.CardPairLayout;
+import com.twb.poker.layout.CommunityCardLayout;
 
 public class PokerGameActivity extends AppCompatActivity {
     private PokerGameThread pokerGameThread;
@@ -42,7 +43,9 @@ public class PokerGameActivity extends AppCompatActivity {
         final CardPairLayout tablePlayer5CardPairLayout = pokerGameRelativeLayout.
                 findViewById(R.id.tablePlayer5CardPairLayout);
 
-        PokerTable pokerTable = new PokerTable();
+        final CommunityCardLayout communityCardLayout = findViewById(R.id.communityCardLayout);
+
+        PokerTable pokerTable = new PokerTable(communityCardLayout);
         pokerTable.addPlayer(playerCardPairLayout, "Thomas", 100d, true);
         pokerTable.addPlayer(tablePlayer1CardPairLayout, "James", 100d, false);
         pokerTable.addPlayer(tablePlayer2CardPairLayout, "Andrew", 100d, false);

@@ -5,11 +5,14 @@ import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.layout.CardPairLayout;
 
 public class PokerPlayer {
-
     private final PlayerUser playerUser;
+
     private final CardPairLayout cardPairLayout;
+
     private final boolean currentPlayer;
+
     private boolean dealerPlayer;
+
     private Card[] hand = new Card[2];
 
     PokerPlayer(CardPairLayout cardPairLayout, PlayerUser playerUser, boolean currentPlayer) {
