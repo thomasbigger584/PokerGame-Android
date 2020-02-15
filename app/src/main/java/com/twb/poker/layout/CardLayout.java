@@ -29,13 +29,10 @@ public class CardLayout extends FrameLayout {
     }
 
     public void update(final Card card) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                int cardDrawResId = CardToCardDrawableUtil.getDrawableResFromCard(getContext(), card);
-                cardImageView.setImageResource(cardDrawResId);
-                cardImageView.setVisibility(VISIBLE);
-            }
+        post(() -> {
+            int cardDrawResId = CardToCardDrawableUtil.getDrawableResFromCard(getContext(), card);
+            cardImageView.setImageResource(cardDrawResId);
+            cardImageView.setVisibility(VISIBLE);
         });
     }
 

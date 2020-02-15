@@ -38,22 +38,19 @@ public class CardPairLayout extends FrameLayout {
     }
 
     public void update(final Card card) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                int cardDrawResId = CardToCardDrawableUtil.getDrawableResFromCard(getContext(), card);
+        post(() -> {
+            int cardDrawResId = CardToCardDrawableUtil.getDrawableResFromCard(getContext(), card);
 
-                if (cardImageViews[0].getVisibility() != INVISIBLE &&
-                        cardImageViews[1].getVisibility() != INVISIBLE) {
-                    clear();
-                }
-                if (cardImageViews[0].getVisibility() == INVISIBLE) {
-                    cardImageViews[0].setImageResource(cardDrawResId);
-                    cardImageViews[0].setVisibility(VISIBLE);
-                } else if (cardImageViews[1].getVisibility() == INVISIBLE) {
-                    cardImageViews[1].setImageResource(cardDrawResId);
-                    cardImageViews[1].setVisibility(VISIBLE);
-                }
+            if (cardImageViews[0].getVisibility() != INVISIBLE &&
+                    cardImageViews[1].getVisibility() != INVISIBLE) {
+                clear();
+            }
+            if (cardImageViews[0].getVisibility() == INVISIBLE) {
+                cardImageViews[0].setImageResource(cardDrawResId);
+                cardImageViews[0].setVisibility(VISIBLE);
+            } else if (cardImageViews[1].getVisibility() == INVISIBLE) {
+                cardImageViews[1].setImageResource(cardDrawResId);
+                cardImageViews[1].setVisibility(VISIBLE);
             }
         });
     }

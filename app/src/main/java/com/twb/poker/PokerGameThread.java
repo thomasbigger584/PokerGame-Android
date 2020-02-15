@@ -160,11 +160,6 @@ public class PokerGameThread extends Thread {
     }
 
     private void toast(final String message) {
-        uiHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            }
-        });
+        uiHandler.post(() -> Toast.makeText(context, message, Toast.LENGTH_SHORT).show());
     }
 }
