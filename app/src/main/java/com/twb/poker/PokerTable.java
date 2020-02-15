@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class PokerTable extends ArrayList<PokerPlayer> {
+    private static final int NO_DEALER = -1;
 
     public PokerTable reorderPokerTableForDealer() {
         int dealerIndex = getDealerIndex();
 
-        if (dealerIndex == -1) {
+        if (dealerIndex == NO_DEALER) {
             Random random = new Random();
             int newDealerIndex = random.nextInt(size());
             PokerPlayer pokerPlayer = get(newDealerIndex);
             pokerPlayer.setDealerPlayer(true);
+            dealerIndex = newDealerIndex;
         }
 
-        dealerIndex = getDealerIndex();
         if (dealerIndex == size()) {
             return this;
         }
@@ -40,17 +41,6 @@ public class PokerTable extends ArrayList<PokerPlayer> {
                 return index;
             }
         }
-        return -1;
-    }
-
-    public boolean checkMultipleDealers() {
-        int dealerCount = 0;
-        for (int index = 0; index < size(); index++) {
-            PokerPlayer player = get(index);
-            if (player.isDealerPlayer()) {
-                dealerCount++;
-            }
-        }
-        return dealerCount > 1;
+        return NO_DEALER;
     }
 }

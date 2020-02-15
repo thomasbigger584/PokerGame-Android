@@ -13,9 +13,10 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
+        android:contentDescription="Left Card"
         android:rotation="-10"
         android:src="@drawable/back"
-        android:contentDescription="Left Card" />
+        android:visibility="invisible" />
 
     <ImageView
         android:id="@+id/rightCardImageView"
@@ -23,9 +24,10 @@
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
+        android:contentDescription="Right Card"
         android:rotation="10"
         android:src="@drawable/back"
-        android:contentDescription="Right Card">
+        android:visibility="invisible">
 
     </ImageView>
 

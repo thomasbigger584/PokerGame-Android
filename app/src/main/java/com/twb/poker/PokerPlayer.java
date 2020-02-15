@@ -1,6 +1,7 @@
 package com.twb.poker;
 
 import com.twb.poker.domain.Card;
+import com.twb.poker.layout.CardPairLayout;
 
 public class PokerPlayer {
 
@@ -20,7 +21,12 @@ public class PokerPlayer {
         this.currentPlayer = currentPlayer;
     }
 
-    public void updateHand(final Card card) {
+    public void update(final Card card) {
+        cardPairLayout.update(card);
+        updateHand(card);
+    }
+
+    private void updateHand(final Card card) {
         if (hand[0] != null && hand[1] != null) {
             hand = new Card[2];
         }

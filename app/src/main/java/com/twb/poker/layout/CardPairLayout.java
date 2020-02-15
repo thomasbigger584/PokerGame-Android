@@ -1,4 +1,4 @@
-package com.twb.poker;
+package com.twb.poker.layout;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -9,15 +9,16 @@ import android.widget.ImageView;
 
 import androidx.annotation.DrawableRes;
 
+import com.twb.poker.R;
 import com.twb.poker.domain.Card;
 
 public class CardPairLayout extends FrameLayout {
 
     private ImageView[] cardImageViews = new ImageView[2];
-    private Card[] cardHand = new Card[2];
 
     public CardPairLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
+        init();
     }
 
     public CardPairLayout(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -37,7 +38,6 @@ public class CardPairLayout extends FrameLayout {
             imageView.setImageResource(R.drawable.back);
             imageView.setVisibility(INVISIBLE);
         }
-        cardHand = new Card[2];
     }
 
     public void update(final Card card) {
@@ -46,18 +46,16 @@ public class CardPairLayout extends FrameLayout {
             public void run() {
                 int cardDrawResId = getDrawableResFromCard(card);
 
-                if (cardHand[0] != null && cardHand[1] != null) {
+                if (cardImageViews[0].getVisibility() != INVISIBLE &&
+                        cardImageViews[1].getVisibility() != INVISIBLE) {
                     clear();
                 }
-
-                if (cardHand[0] == null) {
+                if (cardImageViews[0].getVisibility() == INVISIBLE) {
                     cardImageViews[0].setImageResource(cardDrawResId);
                     cardImageViews[0].setVisibility(VISIBLE);
-                    cardHand[0] = card;
-                } else if (cardHand[1] == null) {
+                } else if (cardImageViews[1].getVisibility() == INVISIBLE) {
                     cardImageViews[1].setImageResource(cardDrawResId);
                     cardImageViews[1].setVisibility(VISIBLE);
-                    cardHand[1] = card;
                 }
             }
         });

@@ -3,10 +3,12 @@ package com.twb.poker;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.twb.poker.layout.CardPairLayout;
 
 public class PokerGameActivity extends AppCompatActivity {
     private PokerGameThread pokerGameThread;
@@ -18,7 +20,7 @@ public class PokerGameActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        RelativeLayout pokerGameRelativeLayout = findViewById(R.id.pokerGameRelativeLayout);
+        LinearLayout pokerGameRelativeLayout = findViewById(R.id.pokerGameLinearLayout);
         pokerGameRelativeLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE

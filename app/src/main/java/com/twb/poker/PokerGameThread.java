@@ -3,7 +3,6 @@ package com.twb.poker;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.DeckOfCardsFactory;
@@ -44,24 +43,11 @@ public class PokerGameThread extends Thread {
         for (int dealRoundIndex = 0; dealRoundIndex < NO_CARDS_FOR_PLAYER_DEAL; dealRoundIndex++) {
             for (PokerPlayer pokerPlayer : pokerTable) {
                 final Card cardToDeal = deckOfCards.get(deckCardPointer);
-
-                CardPairLayout cardPairLayout = pokerPlayer.getCardPairLayout();
-                cardPairLayout.update(cardToDeal);
-
-                pokerPlayer.updateHand(cardToDeal);
-
+                pokerPlayer.update(cardToDeal);
                 deckCardPointer++;
-
                 dealSleep();
             }
         }
-
-        uiHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, "Finished initial deal", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void dealSleep() {
