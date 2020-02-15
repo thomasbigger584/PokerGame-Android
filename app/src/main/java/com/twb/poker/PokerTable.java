@@ -1,11 +1,21 @@
 package com.twb.poker;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class PokerTable extends ArrayList<PokerPlayer> {
 
     public PokerTable reorderPokerTableForDealer() {
         int dealerIndex = getDealerIndex();
+
+        if (dealerIndex == -1) {
+            Random random = new Random();
+            int newDealerIndex = random.nextInt(size());
+            PokerPlayer pokerPlayer = get(newDealerIndex);
+            pokerPlayer.setDealerPlayer(true);
+        }
+
+        dealerIndex = getDealerIndex();
         if (dealerIndex == size()) {
             return this;
         }

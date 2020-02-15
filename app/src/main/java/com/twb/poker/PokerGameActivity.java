@@ -41,12 +41,12 @@ public class PokerGameActivity extends AppCompatActivity {
                 findViewById(R.id.tablePlayer5CardPairLayout);
 
         PokerTable pokerTable = new PokerTable();
-        pokerTable.add(new PokerPlayer(playerCardPairLayout, true, false));
-        pokerTable.add(new PokerPlayer(tablePlayer1CardPairLayout, false, false));
-        pokerTable.add(new PokerPlayer(tablePlayer2CardPairLayout, false, false));
-        pokerTable.add(new PokerPlayer(tablePlayer3CardPairLayout, false, false));
-        pokerTable.add(new PokerPlayer(tablePlayer4CardPairLayout, false, false));
-        pokerTable.add(new PokerPlayer(tablePlayer5CardPairLayout, false, true));
+        pokerTable.add(new PokerPlayer(playerCardPairLayout, true));
+        pokerTable.add(new PokerPlayer(tablePlayer1CardPairLayout, false));
+        pokerTable.add(new PokerPlayer(tablePlayer2CardPairLayout, false));
+        pokerTable.add(new PokerPlayer(tablePlayer3CardPairLayout, false));
+        pokerTable.add(new PokerPlayer(tablePlayer4CardPairLayout, false));
+        pokerTable.add(new PokerPlayer(tablePlayer5CardPairLayout, false));
 
         pokerGameThread = new PokerGameThread(this, pokerTable);
     }

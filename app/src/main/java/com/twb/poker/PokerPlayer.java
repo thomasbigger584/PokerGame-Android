@@ -6,13 +6,18 @@ public class PokerPlayer {
 
     private final CardPairLayout cardPairLayout;
     private final boolean currentPlayer;
-    private final boolean dealerPlayer;
+    private boolean dealerPlayer;
     private Card[] hand = new Card[2];
 
     PokerPlayer(CardPairLayout cardPairLayout, boolean currentPlayer, boolean dealerPlayer) {
         this.cardPairLayout = cardPairLayout;
         this.currentPlayer = currentPlayer;
         this.dealerPlayer = dealerPlayer;
+    }
+
+    PokerPlayer(CardPairLayout cardPairLayout, boolean currentPlayer) {
+        this.cardPairLayout = cardPairLayout;
+        this.currentPlayer = currentPlayer;
     }
 
     public void updateHand(final Card card) {
@@ -32,5 +37,9 @@ public class PokerPlayer {
 
     public boolean isDealerPlayer() {
         return this.dealerPlayer;
+    }
+
+    public void setDealerPlayer(boolean dealerPlayer) {
+        this.dealerPlayer = dealerPlayer;
     }
 }
