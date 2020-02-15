@@ -7,9 +7,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.twb.poker.R;
+import com.twb.poker.domain.Card;
 
 public class CardLayout extends FrameLayout {
-
     private ImageView cardImageView;
 
     public CardLayout(Context context, AttributeSet attrs) {
@@ -25,8 +25,22 @@ public class CardLayout extends FrameLayout {
     private void init() {
         View inflatedView = inflate(getContext(), R.layout.card, this);
         cardImageView = inflatedView.findViewById(R.id.cardImageView);
-        cardImageView.setImageResource(R.drawable.back);
+        clear();
     }
 
+    public void update(final Card card) {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                int cardDrawResId = CardToCardDrawableUtil.getDrawableResFromCard(getContext(), card);
+                cardImageView.setImageResource(cardDrawResId);
+                cardImageView.setVisibility(VISIBLE);
+            }
+        });
+    }
 
+    public void clear() {
+        cardImageView.setImageDrawable(null);
+        cardImageView.setVisibility(INVISIBLE);
+    }
 }

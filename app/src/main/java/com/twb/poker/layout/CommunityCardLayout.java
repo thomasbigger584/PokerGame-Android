@@ -1,13 +1,19 @@
 package com.twb.poker.layout;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import com.twb.poker.R;
+import com.twb.poker.domain.Card;
+import com.twb.poker.domain.CommunityCardType;
 
 public class CommunityCardLayout extends FrameLayout {
+
+    private Handler uiHandler = new Handler(Looper.getMainLooper());
 
     private CardLayout community1CardLayout;
     private CardLayout community2CardLayout;
@@ -32,5 +38,71 @@ public class CommunityCardLayout extends FrameLayout {
         community3CardLayout = inflatedView.findViewById(R.id.community3CardLayout);
         community4CardLayout = inflatedView.findViewById(R.id.community4CardLayout);
         community5CardLayout = inflatedView.findViewById(R.id.community5CardLayout);
+        setInvisible();
+    }
+
+    public void dealCard(final Card card, CommunityCardType cardType) {
+        switch (cardType) {
+            case FLOP_1: {
+                setFlopVisibility();
+                community1CardLayout.update(card);
+                break;
+            }
+            case FLOP_2: {
+                community2CardLayout.update(card);
+                break;
+            }
+            case FLOP_3: {
+                community3CardLayout.update(card);
+                break;
+            }
+            case RIVER: {
+                setRiverVisibility();
+                community4CardLayout.update(card);
+                break;
+            }
+            case TURN: {
+                setTurnVisibility();
+                community5CardLayout.update(card);
+            }
+        }
+    }
+
+    public void setFlopVisibility() {
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                community1CardLayout.setVisibility(VISIBLE);
+                community2CardLayout.setVisibility(VISIBLE);
+                community3CardLayout.setVisibility(VISIBLE);
+            }
+        });
+    }
+
+    public void setRiverVisibility() {
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                community4CardLayout.setVisibility(VISIBLE);
+            }
+        });
+
+    }
+
+    public void setTurnVisibility() {
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                community5CardLayout.setVisibility(VISIBLE);
+            }
+        });
+    }
+
+    public void setInvisible() {
+        this.community1CardLayout.setVisibility(INVISIBLE);
+        this.community2CardLayout.setVisibility(INVISIBLE);
+        this.community3CardLayout.setVisibility(INVISIBLE);
+        this.community4CardLayout.setVisibility(INVISIBLE);
+        this.community5CardLayout.setVisibility(INVISIBLE);
     }
 }

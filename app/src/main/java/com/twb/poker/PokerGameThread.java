@@ -6,13 +6,14 @@ import android.os.Looper;
 import android.widget.Toast;
 
 import com.twb.poker.domain.Card;
+import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.DeckOfCardsFactory;
 import com.twb.poker.domain.PokerGameState;
 
 import java.util.List;
 
 public class PokerGameThread extends Thread {
-    private static final int DEAL_TIME_IN_MS = 2 * 1000;
+    private static final double DEAL_TIME_IN_MS = 1.25 * 1000;
 
     private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
 
@@ -58,20 +59,20 @@ public class PokerGameThread extends Thread {
                     flopDealBet();
                     break;
                 }
-                case TURN_DEAL: {
-                    turnDeal();
-                    break;
-                }
-                case TURN_DEAL_BET: {
-                    turnDealBet();
-                    break;
-                }
                 case RIVER_DEAL: {
                     riverDeal();
                     break;
                 }
                 case RIVER_DEAL_BET: {
                     riverDealBet();
+                    break;
+                }
+                case TURN_DEAL: {
+                    turnDeal();
+                    break;
+                }
+                case TURN_DEAL_BET: {
+                    turnDealBet();
                     break;
                 }
                 case EVAL: {
@@ -83,15 +84,6 @@ public class PokerGameThread extends Thread {
         }
 
         toast("Game Finished");
-    }
-
-    private void toast(final String message) {
-        uiHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void initDeal() {
@@ -112,9 +104,10 @@ public class PokerGameThread extends Thread {
     }
 
     private void flopDeal() {
-        dealSleep();
-        toast("flopDeal");
-        dealSleep();
+        dealCommunityCard(CommunityCardType.BURN_PRE_FLOP);
+        dealCommunityCard(CommunityCardType.FLOP_1);
+        dealCommunityCard(CommunityCardType.FLOP_2);
+        dealCommunityCard(CommunityCardType.FLOP_3);
     }
 
     private void flopDealBet() {
@@ -124,9 +117,8 @@ public class PokerGameThread extends Thread {
     }
 
     private void turnDeal() {
-        dealSleep();
-        toast("turnDeal");
-        dealSleep();
+        dealCommunityCard(CommunityCardType.BURN_PRE_TURN);
+        dealCommunityCard(CommunityCardType.TURN);
     }
 
     private void turnDealBet() {
@@ -136,9 +128,8 @@ public class PokerGameThread extends Thread {
     }
 
     private void riverDeal() {
-        dealSleep();
-        toast("riverDeal");
-        dealSleep();
+        dealCommunityCard(CommunityCardType.BURN_PRE_RIVER);
+        dealCommunityCard(CommunityCardType.RIVER);
     }
 
     private void riverDealBet() {
@@ -153,11 +144,27 @@ public class PokerGameThread extends Thread {
         dealSleep();
     }
 
+    private void dealCommunityCard(CommunityCardType cardType) {
+        final Card card = deckOfCards.get(deckCardPointer);
+        pokerTable.dealCommunityCard(card, cardType);
+        deckCardPointer++;
+        dealSleep();
+    }
+
     private void dealSleep() {
         try {
-            sleep(DEAL_TIME_IN_MS);
+            sleep(Math.round(DEAL_TIME_IN_MS));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void toast(final String message) {
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -1,5 +1,8 @@
 package com.twb.poker;
 
+import com.twb.poker.domain.Card;
+import com.twb.poker.domain.CommunityCardType;
+import com.twb.poker.domain.CommunityCards;
 import com.twb.poker.domain.PlayerBank;
 import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.layout.CardPairLayout;
@@ -11,10 +14,19 @@ import java.util.Random;
 public class PokerTable extends ArrayList<PokerPlayer> {
     private static final int NO_DEALER = -1;
 
-    private CommunityCardLayout communityCardLayout;
+    private final CommunityCardLayout communityCardLayout;
+    private final CommunityCards communityCards;
 
     public PokerTable(CommunityCardLayout communityCardLayout) {
         this.communityCardLayout = communityCardLayout;
+        this.communityCards = new CommunityCards();
+    }
+
+    public void dealCommunityCard(final Card card, CommunityCardType cardType) {
+        communityCards.add(card);
+        if (cardType.isPlayable()) {
+            communityCardLayout.dealCard(card, cardType);
+        }
     }
 
     public void addPlayer(CardPairLayout cardPairLayout, String displayName,

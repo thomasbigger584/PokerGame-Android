@@ -1,13 +1,10 @@
 package com.twb.poker.layout;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-
-import androidx.annotation.DrawableRes;
 
 import com.twb.poker.R;
 import com.twb.poker.domain.Card;
@@ -44,7 +41,7 @@ public class CardPairLayout extends FrameLayout {
         post(new Runnable() {
             @Override
             public void run() {
-                int cardDrawResId = getDrawableResFromCard(card);
+                int cardDrawResId = CardToCardDrawableUtil.getDrawableResFromCard(getContext(), card);
 
                 if (cardImageViews[0].getVisibility() != INVISIBLE &&
                         cardImageViews[1].getVisibility() != INVISIBLE) {
@@ -59,15 +56,5 @@ public class CardPairLayout extends FrameLayout {
                 }
             }
         });
-    }
-
-    @DrawableRes
-    private int getDrawableResFromCard(Card card) {
-        String cardDrawRes = card.getDrawable();
-        Context context = getContext();
-        Resources resources = getResources();
-
-        return resources.getIdentifier(cardDrawRes,
-                "drawable", context.getPackageName());
     }
 }
