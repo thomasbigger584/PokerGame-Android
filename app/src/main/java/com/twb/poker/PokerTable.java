@@ -1,10 +1,21 @@
 package com.twb.poker;
 
+import com.twb.poker.domain.PlayerBank;
+import com.twb.poker.domain.PlayerUser;
+import com.twb.poker.layout.CardPairLayout;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 public class PokerTable extends ArrayList<PokerPlayer> {
     private static final int NO_DEALER = -1;
+
+    public void addPlayer(CardPairLayout cardPairLayout, String displayName, double funds, boolean currentPlayer) {
+        PlayerBank playerBank = new PlayerBank(funds);
+        PlayerUser playerUser = new PlayerUser(displayName, playerBank);
+        PokerPlayer pokerPlayer = new PokerPlayer(cardPairLayout, playerUser, currentPlayer);
+        add(pokerPlayer);
+    }
 
     public PokerTable reorderPokerTableForDealer() {
         int dealerIndex = getDealerIndex();

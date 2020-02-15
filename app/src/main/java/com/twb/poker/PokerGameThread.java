@@ -36,7 +36,6 @@ public class PokerGameThread extends Thread {
     @Override
     public void run() {
         dealCards();
-
     }
 
     private void dealCards() {

@@ -20,5 +20,5 @@
         android:endColor="@android:color/transparent"
         android:startColor="@android:color/transparent" />
 
-    <solid android:color="@color/black_overlay" />
+    <solid android:color="@color/blackOverlay" />
 </shape>

@@ -10,6 +10,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:contentDescription="Card"
-        android:src="@drawable/back" />
+        android:src="@drawable/sa" />
 
 </FrameLayout>
