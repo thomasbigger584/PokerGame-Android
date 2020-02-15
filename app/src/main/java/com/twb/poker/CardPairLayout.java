@@ -35,6 +35,7 @@ public class CardPairLayout extends FrameLayout {
     public void clear() {
         for (ImageView imageView : cardImageViews) {
             imageView.setImageResource(R.drawable.back);
+            imageView.setVisibility(INVISIBLE);
         }
         cardHand = new Card[2];
     }
@@ -51,9 +52,11 @@ public class CardPairLayout extends FrameLayout {
 
                 if (cardHand[0] == null) {
                     cardImageViews[0].setImageResource(cardDrawResId);
+                    cardImageViews[0].setVisibility(VISIBLE);
                     cardHand[0] = card;
                 } else if (cardHand[1] == null) {
                     cardImageViews[1].setImageResource(cardDrawResId);
+                    cardImageViews[1].setVisibility(VISIBLE);
                     cardHand[1] = card;
                 }
             }
