@@ -7,7 +7,6 @@
 
 extern "C" {
 
-// create buffer queue audio player
 JNIEXPORT jint JNICALL
 Java_com_twb_poker_PokerHandEvaluator_getRank(JNIEnv *env, jclass clazz, jint i, jint j, jint k,
                                               jint m, jint n, jint p, jint q) {
