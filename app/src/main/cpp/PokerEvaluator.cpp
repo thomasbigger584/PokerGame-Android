@@ -1,7 +1,3 @@
-//
-// Created by Thomas Bigger on 2020-02-15.
-//
-
 #include <jni.h>
 #include "SevenEval.h"
 
