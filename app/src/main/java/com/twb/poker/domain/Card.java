@@ -6,6 +6,8 @@ package com.twb.poker.domain;
 public class Card {
     private final int value;  // Format: xxxAKQJT 98765432 CDHSrrrr xxPPPPPP
 
+    private final int rankValue;
+
     // Ranks
     public static final int DEUCE = 0;
     public static final int TREY = 1;
@@ -36,7 +38,7 @@ public class Card {
      * @param rank the rank of the card, e.g. {@link Card#SIX}
      * @param suit the suit of the card, e.g. {@link Card#CLUBS}
      */
-    public Card(int rank, int suit) {
+    public Card(int rank, int suit, int rankValue) {
         if (!isValidRank(rank)) {
             throw new IllegalArgumentException("Invalid rank.");
         }
@@ -45,7 +47,12 @@ public class Card {
             throw new IllegalArgumentException("Invalid suit.");
         }
 
-        value = (1 << (rank + 16)) | suit | (rank << 8) | Tables.PRIMES[rank];
+        this.value = (1 << (rank + 16)) | suit | (rank << 8) | Tables.PRIMES[rank];
+
+        if (rankValue < 0 || rankValue > 51) {
+            throw new IllegalArgumentException("Invalid Rank Value");
+        }
+        this.rankValue = rankValue;
     }
 
     public String getDrawable() {
@@ -53,24 +60,6 @@ public class Card {
         char suit = SUITS.charAt((int) (Math.log(getSuit()) / Math.log(2)) - 12);
         String drawableName = String.valueOf(suit) + String.valueOf(rank);
         return drawableName.toLowerCase();
-    }
-    /**
-     * Create a new {@link Card} instance from the given string.
-     * The string should be a two-character string where the first character
-     * is the rank and the second character is the suit. For example, "Kc" means
-     * the king of clubs, and "As" means the ace of spades.
-     * @param string Card to create as a string.
-     * @return a new {@link Card} instance corresponding to the given string.
-     */
-    public static Card fromString(String string) {
-        if (string == null || string.length() != 2) {
-            throw new IllegalArgumentException("Card string must be non-null with length of exactly 2.");
-        }
-
-        final int rank = RANKS.indexOf(string.charAt(0));
-        final int suit = SPADES << SUITS.indexOf(string.charAt(1));
-
-        return new Card(rank, suit);
     }
 
     /**
@@ -125,7 +114,7 @@ public class Card {
      * suit, and <code>PPPPPP</code> is the prime number of the card.
      * @return the value of the card.
      */
-    int getValue() {
+    public int getValue() {
         return value;
     }
 
@@ -145,5 +134,9 @@ public class Card {
      */
     private static boolean isValidSuit(int suit) {
         return suit == CLUBS || suit == DIAMONDS || suit == HEARTS || suit == SPADES;
+    }
+
+    public int getRankValue() {
+        return this.rankValue;
     }
 }

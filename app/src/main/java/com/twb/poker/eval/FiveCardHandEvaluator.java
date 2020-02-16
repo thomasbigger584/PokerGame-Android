@@ -1,13 +1,16 @@
-package com.twb.poker.domain;
+package com.twb.poker.eval;
+
+import com.twb.poker.domain.Card;
+import com.twb.poker.domain.Tables;
 
 import java.util.Arrays;
 
 /** Utility methods for evaluating or creating a hand of cards. */
-public abstract class Hand {
+public abstract class FiveCardHandEvaluator {
     /**
      * Private constructor to disable instantiation of an abstract class.
      */
-    private Hand() {
+    private FiveCardHandEvaluator() {
 
     }
 
@@ -52,43 +55,6 @@ public abstract class Hand {
         // Remaining cards
         final int product = (c1 & 0xFF) * (c2 & 0xFF) * (c3 & 0xFF) * (c4 & 0xFF) * (c5 & 0xFF);
         return Tables.Hash.Values.TABLE[hash(product)];
-    }
-
-    /**
-     * Creates a new 5-card hand from the given string.
-     * @param string the string to create the hand from, such as "Kd 5s Jc Ah Qc"
-     * @return a new hand as an array of cards
-     * @see Card
-     */
-    public static Card[] create5CardHandFromString(String string) {
-        final String[] parts = string.split(" ");
-        final Card[] cards = new Card[parts.length];
-
-        if (parts.length != 5)
-            throw new IllegalArgumentException("Exactly 5 cards are required.");
-
-        int index = 0;
-        for (String part : parts)
-            cards[index++] = Card.fromString(part);
-
-        return cards;
-    }
-
-    /**
-     * Converts the given hand into concatenation of their string representations
-     * @param cards a hand of cards
-     * @return a concatenation of the string representations of the given cards
-     */
-    public static String handToString(Card[] cards) {
-        final StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < cards.length; i++) {
-            builder.append(cards[i]);
-            if (i < cards.length - 1)
-                builder.append(" ");
-        }
-
-        return builder.toString();
     }
 
     /**

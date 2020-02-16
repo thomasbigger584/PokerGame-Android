@@ -1,13 +1,13 @@
-package com.twb.poker;
+package com.twb.poker.eval;
 
 import com.twb.poker.domain.Card;
 
-public class PokerHandEvaluator {
+public class SevenCardHandEvaluator {
     static {
         System.loadLibrary("native-poker-eval-jni");
     }
 
-    private PokerHandEvaluator() {
+    private SevenCardHandEvaluator() {
     }
 
     public static native int getRank(int i, int j, int k, int m, int n, int p, int q);

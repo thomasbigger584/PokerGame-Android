@@ -5,16 +5,17 @@ import java.util.Collections;
 import java.util.List;
 
 public class DeckOfCardsFactory {
-
-    private static final int[] RANKS = new int[]{Card.DEUCE, Card.TREY, Card.FOUR, Card.FIVE, Card.SIX, Card.SEVEN, Card.EIGHT, Card.NINE, Card.TEN, Card.JACK, Card.QUEEN, Card.KING, Card.ACE};
-    private static final int[] SUITS = new int[]{Card.SPADES, Card.CLUBS, Card.HEARTS, Card.DIAMONDS};
+    private static final int[] RANKS = new int[]{Card.ACE, Card.KING, Card.QUEEN, Card.JACK, Card.TEN,
+            Card.NINE, Card.EIGHT, Card.SEVEN, Card.SIX, Card.FIVE, Card.FOUR, Card.TREY, Card.DEUCE};
+    private static final int[] SUITS = new int[]{Card.SPADES, Card.HEARTS, Card.DIAMONDS, Card.CLUBS};
 
     private static final List<Card> CARDS = new ArrayList<>();
 
     static {
+        int valueIndex = 0;
         for (int rank : RANKS) {
             for (int suit : SUITS) {
-                CARDS.add(new Card(rank, suit));
+                CARDS.add(new Card(rank, suit, valueIndex++));
             }
         }
     }
