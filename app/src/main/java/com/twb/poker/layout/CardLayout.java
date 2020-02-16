@@ -14,7 +14,6 @@ public class CardLayout extends FrameLayout {
 
     public CardLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
-        init();
     }
 
     public CardLayout(Context context, AttributeSet attrs, int defStyleAttr) {
