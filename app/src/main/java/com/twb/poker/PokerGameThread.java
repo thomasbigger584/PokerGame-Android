@@ -9,7 +9,6 @@ import android.widget.Toast;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.DeckOfCardsFactory;
-import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.domain.PokerGameState;
 
 import java.util.List;
@@ -139,12 +138,13 @@ public class PokerGameThread extends Thread {
     }
 
     private void eval() {
-        pokerTable.evaluateHandsAndSortPlayers();
-
-        PokerPlayer pokerPlayer = pokerTable.get(0);
-        PlayerUser playerUser = pokerPlayer.getPlayerUser();
-        toast("Winner is " + playerUser.getDisplayName() + " with : " + pokerPlayer.getHand());
-
+        List<PokerPlayer> pokerPlayerWinners =
+                pokerTable.evaluateAndGetWinners();
+        if (pokerPlayerWinners.size() == 1) {
+            toast("Winner is " + pokerPlayerWinners.get(0).getPlayerUser().getDisplayName() + " with : " + pokerPlayerWinners.get(0).getHand());
+        } else {
+            toast("Split pot");
+        }
     }
 
     private void dealCommunityCard(CommunityCardType cardType) {

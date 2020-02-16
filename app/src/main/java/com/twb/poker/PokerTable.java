@@ -78,7 +78,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         return NO_DEALER;
     }
 
-    public void evaluateHandsAndSortPlayers() {
+    public List<PokerPlayer> evaluateAndGetWinners() {
         List<Card> playableCards = communityCards.getPlayableCards();
         for (PokerPlayer pokerPlayer : this) {
             Hand hand = pokerPlayer.getHand();
@@ -90,5 +90,15 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             Hand o2Hand = o2.getHand();
             return o2Hand.compareTo(o1Hand);
         });
+
+        List<PokerPlayer> handWinners = new ArrayList<>();
+        int winningRankValue = get(0).getHand().getRank();
+        for (PokerPlayer pokerPlayer : this) {
+            Hand hand = pokerPlayer.getHand();
+            if (hand.getRank() == winningRankValue) {
+                handWinners.add(pokerPlayer);
+            }
+        }
+        return handWinners;
     }
 }
