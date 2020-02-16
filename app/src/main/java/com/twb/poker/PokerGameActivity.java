@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,12 @@ import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
 
 public class PokerGameActivity extends AppCompatActivity {
+    static {
+        System.loadLibrary("native-poker-eval-jni");
+    }
+
+    public static native int getRank(int val1, int val2);
+
     private PokerGameThread pokerGameThread;
 
     @Override
@@ -60,7 +67,11 @@ public class PokerGameActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+//        pokerGameThread.start();
 
-        pokerGameThread.start();
+        int result = getRank(1, 2);
+        Toast.makeText(this, "Result: " + result, Toast.LENGTH_LONG).show();
     }
+
+
 }
