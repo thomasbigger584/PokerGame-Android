@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#308014"
     android:orientation="vertical"
-    android:padding="20dp"
+    android:padding="10dp"
     tools:context=".PokerGameActivity">
 
     <LinearLayout
@@ -23,7 +23,7 @@
 
         <com.twb.poker.layout.CardPairLayout
             android:id="@+id/tablePlayer2CardPairLayout"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <View
@@ -33,7 +33,7 @@
 
         <com.twb.poker.layout.CardPairLayout
             android:id="@+id/tablePlayer3CardPairLayout"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <View
@@ -43,7 +43,7 @@
 
         <com.twb.poker.layout.CardPairLayout
             android:id="@+id/tablePlayer4CardPairLayout"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <View
@@ -67,7 +67,7 @@
 
         <com.twb.poker.layout.CardPairLayout
             android:id="@+id/tablePlayer1CardPairLayout"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <View
@@ -87,7 +87,7 @@
 
         <com.twb.poker.layout.CardPairLayout
             android:id="@+id/tablePlayer5CardPairLayout"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <View
@@ -110,7 +110,7 @@
 
         <com.twb.poker.layout.CardPairLayout
             android:id="@+id/playerCardPairLayout"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <View

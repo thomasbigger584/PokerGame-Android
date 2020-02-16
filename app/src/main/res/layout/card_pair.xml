@@ -1,45 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="80dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="4dp">
 
-    <RelativeLayout
-        android:layout_width="80dp"
-        android:layout_height="75dp"
-        android:orientation="horizontal">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/leftCardImageView"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
-            android:contentDescription="Left Card"
-            android:rotation="-7"
-            android:visibility="invisible" />
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="-10dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/rightCardImageView"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:contentDescription="Right Card"
-            android:rotation="7"
-            android:visibility="invisible" />
+            <ImageView
+                android:id="@+id/leftCardImageView"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="Left Card"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/rightCardImageView"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="Right Card"
+                android:visibility="invisible" />
+        </LinearLayout>
 
         <include
             android:id="@+id/dealerChipLayout"
             layout="@layout/dealer_chip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:visibility="gone" />
-
-    </RelativeLayout>
+            android:layout_gravity="right|bottom" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/displayNameTextView"

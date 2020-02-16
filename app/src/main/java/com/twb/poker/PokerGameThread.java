@@ -86,6 +86,8 @@ public class PokerGameThread extends Thread {
     }
 
     private void initGame() {
+
+
         this.pokerTable = this.pokerTable.reorderPokerTableForDealer();
         this.deckOfCards = DeckOfCardsFactory.getCards(true);
         this.deckCardPointer = 0;
@@ -106,8 +108,6 @@ public class PokerGameThread extends Thread {
     }
 
     private void initDealBet() {
-
-        toast("flopDealBet");
         for (int index = 0; index < pokerTable.size(); index++) {
             PokerPlayer prevPokerPlayer;
             if (index == 0) {
@@ -133,7 +133,6 @@ public class PokerGameThread extends Thread {
     }
 
     private void flopDealBet() {
-        toast("flopDealBet");
         for (int index = 0; index < pokerTable.size(); index++) {
             PokerPlayer prevPokerPlayer;
             if (index == 0) {
@@ -156,7 +155,6 @@ public class PokerGameThread extends Thread {
     }
 
     private void turnDealBet() {
-        toast("turnDealBet");
         for (int index = 0; index < pokerTable.size(); index++) {
             PokerPlayer prevPokerPlayer;
             if (index == 0) {
