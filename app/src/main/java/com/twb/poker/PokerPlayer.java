@@ -27,6 +27,22 @@ public class PokerPlayer {
         hand.update(card);
     }
 
+    public void displayDisplayName() {
+        updateDisplayName(playerUser.getDisplayName());
+    }
+
+    public void displayFunds() {
+        updateFunds(playerUser.getBank().getFunds());
+    }
+
+    public void updateDisplayName(final String displayName) {
+        cardPairLayout.update(displayName);
+    }
+
+    public void updateFunds(final Double funds) {
+        cardPairLayout.update(funds);
+    }
+
     public CardPairLayout getCardPairLayout() {
         return this.cardPairLayout;
     }

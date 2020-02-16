@@ -8,8 +8,13 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.javafaker.Faker;
 import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Random;
 
 public class PokerGameActivity extends AppCompatActivity {
     private PokerGameThread pokerGameThread;
@@ -46,16 +51,27 @@ public class PokerGameActivity extends AppCompatActivity {
         final CommunityCardLayout communityCardLayout = findViewById(R.id.communityCardLayout);
 
         PokerTable pokerTable = new PokerTable(communityCardLayout);
-        pokerTable.addPlayer(playerCardPairLayout, "Thomas", 100d, true);
-        pokerTable.addPlayer(tablePlayer1CardPairLayout, "James", 100d, false);
-        pokerTable.addPlayer(tablePlayer2CardPairLayout, "Andrew", 100d, false);
-        pokerTable.addPlayer(tablePlayer3CardPairLayout, "Rory", 100d, false);
-        pokerTable.addPlayer(tablePlayer4CardPairLayout, "Aidan", 100d, false);
-        pokerTable.addPlayer(tablePlayer5CardPairLayout, "Niall", 100d, false);
+        pokerTable.addPlayer(playerCardPairLayout, "Thomas", generateRandomFunds(100, 300), true);
+
+        pokerTable.addPlayer(tablePlayer1CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
+        pokerTable.addPlayer(tablePlayer2CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
+        pokerTable.addPlayer(tablePlayer3CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
+        pokerTable.addPlayer(tablePlayer4CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
+        pokerTable.addPlayer(tablePlayer5CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
 
         pokerGameThread = new PokerGameThread(this, pokerTable);
     }
 
+    private String generateRandomName() {
+        return new Faker().name().firstName();
+    }
+
+    private double generateRandomFunds(int rangeMin, int rangeMax) {
+        Random r = new Random();
+        double funds = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
+        BigDecimal bd = new BigDecimal(funds).setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {

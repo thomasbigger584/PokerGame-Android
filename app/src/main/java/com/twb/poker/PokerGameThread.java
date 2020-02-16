@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.DeckOfCardsFactory;
+import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.domain.PokerGameState;
 
 import java.util.List;
@@ -22,9 +23,9 @@ public class PokerGameThread extends Thread {
 
     private final Handler uiHandler;
 
-    private final List<Card> deckOfCards;
+    private List<Card> deckOfCards;
 
-    private final PokerTable pokerTable;
+    private PokerTable pokerTable;
 
     private int deckCardPointer;
 
@@ -33,15 +34,14 @@ public class PokerGameThread extends Thread {
     PokerGameThread(Context context, PokerTable pokerTable) {
         this.context = context;
         this.uiHandler = new Handler(Looper.getMainLooper());
-
-        this.pokerTable = pokerTable.reorderPokerTableForDealer();
-        this.deckOfCards = DeckOfCardsFactory.getCards(true);
-        this.deckCardPointer = 0;
-        this.gameState = PokerGameState.INIT_DEAL;
+        this.pokerTable = pokerTable;
     }
 
     @Override
     public void run() {
+
+        initGame();
+
         while (gameState != PokerGameState.FINISH) {
             switch (gameState) {
                 case INIT_DEAL: {
@@ -83,6 +83,15 @@ public class PokerGameThread extends Thread {
             }
             gameState = gameState.nextState();
         }
+    }
+
+    private void initGame() {
+        this.pokerTable = this.pokerTable.reorderPokerTableForDealer();
+        this.deckOfCards = DeckOfCardsFactory.getCards(true);
+        this.deckCardPointer = 0;
+        this.gameState = PokerGameState.INIT_DEAL;
+
+        this.pokerTable.initPokerTable();
     }
 
     private void initDeal() {
@@ -141,7 +150,9 @@ public class PokerGameThread extends Thread {
         List<PokerPlayer> pokerPlayerWinners =
                 pokerTable.evaluateAndGetWinners();
         if (pokerPlayerWinners.size() == 1) {
-            toast("Winner is " + pokerPlayerWinners.get(0).getPlayerUser().getDisplayName() + " with : " + pokerPlayerWinners.get(0).getHand());
+            PokerPlayer winningPokerPlayer = pokerPlayerWinners.get(0);
+            PlayerUser playerUser = winningPokerPlayer.getPlayerUser();
+            toast("Winner is " + playerUser.getDisplayName() + " with : " + winningPokerPlayer.getHand());
         } else {
             toast("Split pot");
         }

@@ -5,13 +5,17 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.twb.poker.R;
 import com.twb.poker.domain.Card;
 
-public class CardPairLayout extends FrameLayout {
+import java.util.Locale;
 
+public class CardPairLayout extends FrameLayout {
     private ImageView[] cardImageViews = new ImageView[2];
+    private TextView displayNameTextView;
+    private TextView fundsTextView;
 
     public CardPairLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -27,6 +31,8 @@ public class CardPairLayout extends FrameLayout {
         View inflatedView = inflate(getContext(), R.layout.card_pair, this);
         cardImageViews[0] = inflatedView.findViewById(R.id.leftCardImageView);
         cardImageViews[1] = inflatedView.findViewById(R.id.rightCardImageView);
+        displayNameTextView = inflatedView.findViewById(R.id.displayNameTextView);
+        fundsTextView = inflatedView.findViewById(R.id.fundsTextView);
         clear();
     }
 
@@ -52,6 +58,18 @@ public class CardPairLayout extends FrameLayout {
                 cardImageViews[1].setImageResource(cardDrawResId);
                 cardImageViews[1].setVisibility(VISIBLE);
             }
+        });
+    }
+
+    public void update(final Double funds) {
+        post(() -> {
+            fundsTextView.setText(String.format(Locale.getDefault(), "%.2f", funds));
+        });
+    }
+
+    public void update(final String displayName) {
+        post(() -> {
+            displayNameTextView.setText(displayName);
         });
     }
 }
