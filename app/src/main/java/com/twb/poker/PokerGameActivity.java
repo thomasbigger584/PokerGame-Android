@@ -13,12 +13,6 @@ import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
 
 public class PokerGameActivity extends AppCompatActivity {
-    static {
-        System.loadLibrary("native-poker-eval-jni");
-    }
-
-    public static native int getRank(int val1, int val2);
-
     private PokerGameThread pokerGameThread;
 
     @Override
@@ -69,7 +63,7 @@ public class PokerGameActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
 //        pokerGameThread.start();
 
-        int result = getRank(1, 2);
+        int result = PokerHandEvaluator.getRank(0, 4, 8, 12, 16, 20, 24);
         Toast.makeText(this, "Result: " + result, Toast.LENGTH_LONG).show();
     }
 
