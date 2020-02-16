@@ -4,12 +4,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.twb.poker.eval.SevenCardHandEvaluator;
 import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
 
@@ -62,11 +60,6 @@ public class PokerGameActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-//        pokerGameThread.start();
-
-        int result = SevenCardHandEvaluator.getRank(0, 4, 8, 12, 16, 20, 24);
-        Toast.makeText(this, "Result: " + result, Toast.LENGTH_LONG).show();
+        pokerGameThread.start();
     }
-
-
 }

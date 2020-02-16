@@ -139,9 +139,8 @@ public class PokerGameThread extends Thread {
     }
 
     private void eval() {
-        dealSleep();
-        toast("eval");
-        dealSleep();
+        pokerTable.evaluateAllHands();
+
     }
 
     private void dealCommunityCard(CommunityCardType cardType) {

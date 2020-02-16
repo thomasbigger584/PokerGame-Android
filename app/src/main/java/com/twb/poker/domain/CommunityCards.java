@@ -11,7 +11,7 @@ public class CommunityCards extends ArrayList<Card> {
     public List<Card> getFlop() {
         int flop1 = CommunityCardType.FLOP_1.getPosition();
         int flop3 = CommunityCardType.FLOP_3.getPosition();
-        return subList(flop1, flop3);
+        return subList(flop1, flop3 + 1);
     }
 
     public Card getBurnPreRiver() {

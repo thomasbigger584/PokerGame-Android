@@ -48,4 +48,12 @@ public class PokerPlayer {
     public void setDealerPlayer(boolean dealerPlayer) {
         this.dealerPlayer = dealerPlayer;
     }
+
+    public Card[] getHand() {
+        return hand;
+    }
+
+    public PlayerUser getPlayerUser() {
+        return playerUser;
+    }
 }

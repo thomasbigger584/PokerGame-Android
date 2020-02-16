@@ -1,14 +1,18 @@
 package com.twb.poker;
 
+import android.util.Log;
+
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.CommunityCards;
+import com.twb.poker.domain.Hand;
 import com.twb.poker.domain.PlayerBank;
 import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class PokerTable extends ArrayList<PokerPlayer> {
@@ -73,5 +77,21 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             }
         }
         return NO_DEALER;
+    }
+
+    public void evaluateAllHands() {
+        List<Card> playableCards = communityCards.getPlayableCards();
+        Log.e("POKERTABLE", "evaluateAllHands: playableCards.size(): " + playableCards.size());
+        for (PokerPlayer pokerPlayer : this) {
+
+            Card[] hand = pokerPlayer.getHand();
+            Log.e("POKERTABLE", "evaluateAllHands: " + pokerPlayer.getPlayerUser().getDisplayName() + " - size: " + playableCards.size());
+
+            Hand completeHand = new Hand(playableCards, hand);
+
+            completeHand.calculateRank();
+
+
+        }
     }
 }
