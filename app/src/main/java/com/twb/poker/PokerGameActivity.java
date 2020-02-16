@@ -18,6 +18,7 @@ import java.util.Random;
 
 public class PokerGameActivity extends AppCompatActivity {
     private PokerGameThread pokerGameThread;
+    private LinearLayout pokerGameLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,26 +27,20 @@ public class PokerGameActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        LinearLayout pokerGameRelativeLayout = findViewById(R.id.pokerGameLinearLayout);
-        pokerGameRelativeLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        pokerGameLinearLayout = findViewById(R.id.pokerGameLinearLayout);
 
         final CardPairLayout playerCardPairLayout =
-                pokerGameRelativeLayout.findViewById(R.id.playerCardPairLayout);
+                pokerGameLinearLayout.findViewById(R.id.playerCardPairLayout);
 
-        final CardPairLayout tablePlayer1CardPairLayout = pokerGameRelativeLayout.
+        final CardPairLayout tablePlayer1CardPairLayout = pokerGameLinearLayout.
                 findViewById(R.id.tablePlayer1CardPairLayout);
-        final CardPairLayout tablePlayer2CardPairLayout = pokerGameRelativeLayout.
+        final CardPairLayout tablePlayer2CardPairLayout = pokerGameLinearLayout.
                 findViewById(R.id.tablePlayer2CardPairLayout);
-        final CardPairLayout tablePlayer3CardPairLayout = pokerGameRelativeLayout.
+        final CardPairLayout tablePlayer3CardPairLayout = pokerGameLinearLayout.
                 findViewById(R.id.tablePlayer3CardPairLayout);
-        final CardPairLayout tablePlayer4CardPairLayout = pokerGameRelativeLayout.
+        final CardPairLayout tablePlayer4CardPairLayout = pokerGameLinearLayout.
                 findViewById(R.id.tablePlayer4CardPairLayout);
-        final CardPairLayout tablePlayer5CardPairLayout = pokerGameRelativeLayout.
+        final CardPairLayout tablePlayer5CardPairLayout = pokerGameLinearLayout.
                 findViewById(R.id.tablePlayer5CardPairLayout);
 
         final CommunityCardLayout communityCardLayout = findViewById(R.id.communityCardLayout);
@@ -77,5 +72,16 @@ public class PokerGameActivity extends AppCompatActivity {
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         pokerGameThread.start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        pokerGameLinearLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 }
