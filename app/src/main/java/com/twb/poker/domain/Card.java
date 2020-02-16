@@ -100,6 +100,7 @@ public class Card {
      * For example, the king of spades is "Ks", and the jack of hearts is "Jh".
      * @return a string representation of the card.
      */
+    @Override
     public String toString() {
         char rank = RANKS.charAt(getRank());
         char suit = SUITS.charAt((int) (Math.log(getSuit()) / Math.log(2)) - 12);

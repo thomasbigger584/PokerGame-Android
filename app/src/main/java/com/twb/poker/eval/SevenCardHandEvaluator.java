@@ -10,7 +10,7 @@ public class SevenCardHandEvaluator {
     private SevenCardHandEvaluator() {
     }
 
-    public static native int getRank(int i, int j, int k, int m, int n, int p, int q);
+    static native int getRank(int i, int j, int k, int m, int n, int p, int q);
 
     public static int getRank(Hand hand) {
         if (hand.size() != 7) {

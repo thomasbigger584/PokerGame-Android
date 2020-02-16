@@ -3,11 +3,13 @@ package com.twb.poker;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.DeckOfCardsFactory;
+import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.domain.PokerGameState;
 
 import java.util.List;
@@ -82,8 +84,6 @@ public class PokerGameThread extends Thread {
             }
             gameState = gameState.nextState();
         }
-
-        toast("Game Finished");
     }
 
     private void initDeal() {
@@ -139,7 +139,11 @@ public class PokerGameThread extends Thread {
     }
 
     private void eval() {
-        pokerTable.evaluateAllHands();
+        pokerTable.evaluateHandsAndSortPlayers();
+
+        PokerPlayer pokerPlayer = pokerTable.get(0);
+        PlayerUser playerUser = pokerPlayer.getPlayerUser();
+        toast("Winner is " + playerUser.getDisplayName() + " with : " + pokerPlayer.getHand());
 
     }
 
@@ -159,6 +163,7 @@ public class PokerGameThread extends Thread {
     }
 
     private void toast(final String message) {
+        Log.e("PokerGameThread", message);
         uiHandler.post(() -> Toast.makeText(context, message, Toast.LENGTH_SHORT).show());
     }
 }

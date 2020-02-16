@@ -1,6 +1,7 @@
 package com.twb.poker;
 
 import com.twb.poker.domain.Card;
+import com.twb.poker.domain.Hand;
 import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.layout.CardPairLayout;
 
@@ -13,7 +14,7 @@ public class PokerPlayer {
 
     private boolean dealerPlayer;
 
-    private Card[] hand = new Card[2];
+    private Hand hand = new Hand();
 
     PokerPlayer(CardPairLayout cardPairLayout, PlayerUser playerUser, boolean currentPlayer) {
         this.cardPairLayout = cardPairLayout;
@@ -23,18 +24,7 @@ public class PokerPlayer {
 
     public void update(final Card card) {
         cardPairLayout.update(card);
-        updateHand(card);
-    }
-
-    private void updateHand(final Card card) {
-        if (hand[0] != null && hand[1] != null) {
-            hand = new Card[2];
-        }
-        if (hand[0] == null) {
-            hand[0] = card;
-        } else if (hand[1] == null) {
-            hand[1] = card;
-        }
+        hand.update(card);
     }
 
     public CardPairLayout getCardPairLayout() {
@@ -49,11 +39,21 @@ public class PokerPlayer {
         this.dealerPlayer = dealerPlayer;
     }
 
-    public Card[] getHand() {
+    public Hand getHand() {
         return hand;
     }
 
     public PlayerUser getPlayerUser() {
         return playerUser;
+    }
+
+    @Override
+    public String toString() {
+        return "PokerPlayer{" +
+                "playerUser=" + playerUser +
+                ", currentPlayer=" + currentPlayer +
+                ", dealerPlayer=" + dealerPlayer +
+                ", hand=" + hand +
+                '}';
     }
 }
