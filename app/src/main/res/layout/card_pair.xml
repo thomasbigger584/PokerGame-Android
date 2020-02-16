@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="80dp"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="4dp">
 
     <RelativeLayout
         android:layout_width="80dp"
@@ -29,6 +30,15 @@
             android:rotation="7"
             android:visibility="invisible" />
 
+        <include
+            android:id="@+id/dealerChipLayout"
+            layout="@layout/dealer_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone" />
+
     </RelativeLayout>
 
     <TextView
@@ -38,7 +48,8 @@
         android:background="@color/colorPrimary"
         android:gravity="center"
         android:text="--"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/fundsTextView"
@@ -47,6 +58,7 @@
         android:background="@color/colorPrimary"
         android:gravity="center"
         android:text="--"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
 
 </LinearLayout>

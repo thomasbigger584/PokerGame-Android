@@ -1,7 +1,5 @@
 package com.twb.poker;
 
-import android.util.Log;
-
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.CommunityCards;
@@ -24,9 +22,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
 
     public void initPokerTable() {
         for (PokerPlayer pokerPlayer : this) {
-            Log.d(PokerTable.class.getName(), "initPokerTable: " + pokerPlayer.getPlayerUser().getDisplayName());
-            pokerPlayer.displayDisplayName();
-            pokerPlayer.displayFunds();
+            pokerPlayer.updatePokerPlayerOnTable();
         }
     }
 

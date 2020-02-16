@@ -2,6 +2,7 @@ package com.twb.poker;
 
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.Hand;
+import com.twb.poker.domain.PlayerBank;
 import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.layout.CardPairLayout;
 
@@ -16,6 +17,8 @@ public class PokerPlayer {
 
     private Hand hand = new Hand();
 
+    private boolean turnPlayer;
+
     PokerPlayer(CardPairLayout cardPairLayout, PlayerUser playerUser, boolean currentPlayer) {
         this.cardPairLayout = cardPairLayout;
         this.playerUser = playerUser;
@@ -23,24 +26,21 @@ public class PokerPlayer {
     }
 
     public void update(final Card card) {
-        cardPairLayout.update(card);
+        cardPairLayout.updateCardImageView(card);
         hand.update(card);
     }
 
-    public void displayDisplayName() {
-        updateDisplayName(playerUser.getDisplayName());
+    public void updatePokerPlayerOnTable() {
+        String displayName = playerUser.getDisplayName();
+        cardPairLayout.updateDisplayNameTextView(displayName);
+        PlayerBank playerBank = playerUser.getBank();
+        cardPairLayout.updateFundsTextView(playerBank.getFunds());
+        cardPairLayout.updateDealerChip(dealerPlayer);
     }
 
-    public void displayFunds() {
-        updateFunds(playerUser.getBank().getFunds());
-    }
-
-    public void updateDisplayName(final String displayName) {
-        cardPairLayout.update(displayName);
-    }
-
-    public void updateFunds(final Double funds) {
-        cardPairLayout.update(funds);
+    public void setTurnPlayer(boolean turnPlayer) {
+        this.turnPlayer = turnPlayer;
+        cardPairLayout.updateTurnPlayer(turnPlayer);
     }
 
     public CardPairLayout getCardPairLayout() {
@@ -61,6 +61,10 @@ public class PokerPlayer {
 
     public PlayerUser getPlayerUser() {
         return playerUser;
+    }
+
+    public boolean isCurrentPlayer() {
+        return currentPlayer;
     }
 
     @Override

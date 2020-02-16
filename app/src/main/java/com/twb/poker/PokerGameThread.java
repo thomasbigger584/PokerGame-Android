@@ -106,9 +106,23 @@ public class PokerGameThread extends Thread {
     }
 
     private void initDealBet() {
-        dealSleep();
-        toast("initDealBet");
-        dealSleep();
+
+        toast("flopDealBet");
+        for (int index = 0; index < pokerTable.size(); index++) {
+            PokerPlayer prevPokerPlayer;
+            if (index == 0) {
+                prevPokerPlayer = pokerTable.get(pokerTable.size() - 1);
+            } else {
+                prevPokerPlayer = pokerTable.get(index - 1);
+            }
+            PokerPlayer thisPokerPlayer = pokerTable.get(index);
+            prevPokerPlayer.setTurnPlayer(false);
+            thisPokerPlayer.setTurnPlayer(true);
+
+            dealSleep();
+        }
+
+        pokerTable.get(pokerTable.size() - 1).setTurnPlayer(false);
     }
 
     private void flopDeal() {
@@ -119,9 +133,21 @@ public class PokerGameThread extends Thread {
     }
 
     private void flopDealBet() {
-        dealSleep();
         toast("flopDealBet");
-        dealSleep();
+        for (int index = 0; index < pokerTable.size(); index++) {
+            PokerPlayer prevPokerPlayer;
+            if (index == 0) {
+                prevPokerPlayer = pokerTable.get(pokerTable.size() - 1);
+            } else {
+                prevPokerPlayer = pokerTable.get(index - 1);
+            }
+            PokerPlayer thisPokerPlayer = pokerTable.get(index);
+            prevPokerPlayer.setTurnPlayer(false);
+            thisPokerPlayer.setTurnPlayer(true);
+
+            dealSleep();
+        }
+        pokerTable.get(pokerTable.size() - 1).setTurnPlayer(false);
     }
 
     private void turnDeal() {
@@ -130,9 +156,21 @@ public class PokerGameThread extends Thread {
     }
 
     private void turnDealBet() {
-        dealSleep();
         toast("turnDealBet");
-        dealSleep();
+        for (int index = 0; index < pokerTable.size(); index++) {
+            PokerPlayer prevPokerPlayer;
+            if (index == 0) {
+                prevPokerPlayer = pokerTable.get(pokerTable.size() - 1);
+            } else {
+                prevPokerPlayer = pokerTable.get(index - 1);
+            }
+            PokerPlayer thisPokerPlayer = pokerTable.get(index);
+            prevPokerPlayer.setTurnPlayer(false);
+            thisPokerPlayer.setTurnPlayer(true);
+
+            dealSleep();
+        }
+        pokerTable.get(pokerTable.size() - 1).setTurnPlayer(false);
     }
 
     private void riverDeal() {
@@ -141,9 +179,21 @@ public class PokerGameThread extends Thread {
     }
 
     private void riverDealBet() {
-        dealSleep();
         toast("riverDealBet");
-        dealSleep();
+        for (int index = 0; index < pokerTable.size(); index++) {
+            PokerPlayer prevPokerPlayer;
+            if (index == 0) {
+                prevPokerPlayer = pokerTable.get(pokerTable.size() - 1);
+            } else {
+                prevPokerPlayer = pokerTable.get(index - 1);
+            }
+            PokerPlayer thisPokerPlayer = pokerTable.get(index);
+            prevPokerPlayer.setTurnPlayer(false);
+            thisPokerPlayer.setTurnPlayer(true);
+
+            dealSleep();
+        }
+        pokerTable.get(pokerTable.size() - 1).setTurnPlayer(false);
     }
 
     private void eval() {

@@ -16,6 +16,8 @@ public class CardPairLayout extends FrameLayout {
     private ImageView[] cardImageViews = new ImageView[2];
     private TextView displayNameTextView;
     private TextView fundsTextView;
+    private FrameLayout dealerChipLayout;
+    private View inflatedView;
 
     public CardPairLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -27,22 +29,22 @@ public class CardPairLayout extends FrameLayout {
     }
 
     private void init() {
-        View inflatedView = inflate(getContext(), R.layout.card_pair, this);
+        inflatedView = inflate(getContext(), R.layout.card_pair, this);
         cardImageViews[0] = inflatedView.findViewById(R.id.leftCardImageView);
         cardImageViews[1] = inflatedView.findViewById(R.id.rightCardImageView);
         displayNameTextView = inflatedView.findViewById(R.id.displayNameTextView);
         fundsTextView = inflatedView.findViewById(R.id.fundsTextView);
+        dealerChipLayout = inflatedView.findViewById(R.id.dealerChipLayout);
         clear();
     }
 
     public void clear() {
         for (ImageView imageView : cardImageViews) {
-            imageView.setImageResource(R.drawable.back);
             imageView.setVisibility(INVISIBLE);
         }
     }
 
-    public void update(final Card card) {
+    public void updateCardImageView(final Card card) {
         post(() -> {
             int cardDrawResId = CardToCardDrawableUtil.getDrawableResFromCard(getContext(), card);
 
@@ -60,15 +62,33 @@ public class CardPairLayout extends FrameLayout {
         });
     }
 
-    public void update(final Double funds) {
+    public void updateFundsTextView(final Double funds) {
         post(() -> {
             fundsTextView.setText(String.format(Locale.getDefault(), "%.2f", funds));
         });
     }
 
-    public void update(final String displayName) {
+    public void updateDisplayNameTextView(final String displayName) {
         post(() -> {
             displayNameTextView.setText(displayName);
         });
     }
+
+    public void updateDealerChip(boolean dealer) {
+        post(() -> {
+            final int visibility = (dealer) ? VISIBLE : GONE;
+            dealerChipLayout.setVisibility(visibility);
+        });
+    }
+
+    public void updateTurnPlayer(boolean playerTurn) {
+        post(() -> {
+            if (playerTurn) {
+                inflatedView.setBackgroundResource(R.drawable.player_turn_border);
+            } else {
+                inflatedView.setBackground(null);
+            }
+        });
+    }
+
 }
