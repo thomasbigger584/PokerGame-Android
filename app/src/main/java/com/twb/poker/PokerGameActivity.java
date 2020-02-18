@@ -1,9 +1,16 @@
 package com.twb.poker;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,9 +23,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Random;
 
-public class PokerGameActivity extends AppCompatActivity {
+public class PokerGameActivity extends AppCompatActivity implements PokerGameThread.PokerGameThreadCallback {
     private PokerGameThread pokerGameThread;
     private LinearLayout pokerGameLinearLayout;
+    private GridLayout controlsGridLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +53,24 @@ public class PokerGameActivity extends AppCompatActivity {
 
         final CommunityCardLayout communityCardLayout = findViewById(R.id.communityCardLayout);
 
+        controlsGridLayout = findViewById(R.id.controlsGridLayout);
+        Button checkButton = controlsGridLayout.findViewById(R.id.checkButton);
+        checkButton.setOnClickListener(v -> {
+            pokerGameThread.setTurnButtonPressed();
+        });
+        Button foldButton = controlsGridLayout.findViewById(R.id.foldButton);
+        foldButton.setOnClickListener(v -> {
+            pokerGameThread.setTurnButtonPressed();
+        });
+        Button betButton = controlsGridLayout.findViewById(R.id.betButton);
+        betButton.setOnClickListener(v -> {
+            pokerGameThread.setTurnButtonPressed();
+        });
+        Button raiseButton = controlsGridLayout.findViewById(R.id.raiseButton);
+        raiseButton.setOnClickListener(v -> {
+            pokerGameThread.setTurnButtonPressed();
+        });
+
         PokerTable pokerTable = new PokerTable(communityCardLayout);
         pokerTable.addPlayer(playerCardPairLayout, "Thomas", generateRandomFunds(100, 300), true);
 
@@ -54,7 +80,8 @@ public class PokerGameActivity extends AppCompatActivity {
         pokerTable.addPlayer(tablePlayer4CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
         pokerTable.addPlayer(tablePlayer5CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
 
-        pokerGameThread = new PokerGameThread(this, pokerTable);
+        PokerGameThread.PokerGameThreadCallback thisCallback = this;
+        pokerGameThread = new PokerGameThread(pokerTable, thisCallback);
     }
 
     private String generateRandomName() {
@@ -83,5 +110,40 @@ public class PokerGameActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    @Override
+    public void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSecondsLeft(int secondsLeft) {
+        Log.e(PokerGameActivity.class.getName(), "onSecondsLeft: " + secondsLeft);
+    }
+
+    @Override
+    public void onControlsShow() {
+        controlsGridLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onControlsHide() {
+        if (controlsGridLayout.getVisibility() != View.GONE) {
+            controlsGridLayout.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onVibrate() {
+        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        if (vibrator == null) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            vibrator.vibrate(500);
+        }
     }
 }
