@@ -8,7 +8,6 @@ import androidx.annotation.MainThread;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.DeckOfCardsFactory;
-import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.domain.PokerPlayer;
 import com.twb.poker.domain.PokerTable;
 import com.twb.poker.domain.RoundState;
@@ -32,6 +31,7 @@ public class PokerGameThread extends Thread {
     private RoundState roundState;
     private PokerGameThreadCallback callback;
     private boolean turnButtonPressed = false;
+    private boolean winnerDialogOpened = false;
 
     PokerGameThread(PokerTable pokerTable, PokerGameThreadCallback callback) {
         setName(PokerGameThread.class.getSimpleName());
@@ -150,23 +150,10 @@ public class PokerGameThread extends Thread {
     private void eval() {
         List<PokerPlayer> pokerPlayerWinners =
                 pokerTable.evaluateAndGetWinners();
-        if (pokerPlayerWinners.size() == 1) {
-            PokerPlayer winningPokerPlayer = pokerPlayerWinners.get(0);
-            PlayerUser playerUser = winningPokerPlayer.getPlayerUser();
-            toast("Winner is " + playerUser.getDisplayName() +
-                    " with : " + winningPokerPlayer.getHand());
-        } else {
-            StringBuilder winnersString = new StringBuilder();
-            for (int index = 0; index < pokerPlayerWinners.size(); index++) {
-                PokerPlayer winningPokerPlayer = pokerPlayerWinners.get(index);
-                String displayName = winningPokerPlayer.getPlayerUser().getDisplayName();
-                winnersString.append(displayName);
-                if (index != pokerPlayerWinners.size() - 1) {
-                    winnersString.append(", ");
-                }
-            }
-            toast("Split pot: " + winnersString.toString());
-        }
+        callback.onWinnerDialogShow(pokerPlayerWinners, () -> this.winnerDialogOpened = false);
+        do {
+            this.winnerDialogOpened = true;
+        } while (this.winnerDialogOpened);
     }
 
     private void performPlayerBetTurn() {
@@ -254,5 +241,11 @@ public class PokerGameThread extends Thread {
         void onControlsHide();
 
         void onVibrate();
+
+        void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, Callback callback);
+
+        interface Callback {
+            void onUserInput();
+        }
     }
 }

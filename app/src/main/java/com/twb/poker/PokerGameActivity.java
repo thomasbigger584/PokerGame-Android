@@ -16,20 +16,25 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.javafaker.Faker;
+import com.twb.poker.domain.PokerPlayer;
 import com.twb.poker.domain.PokerTable;
 import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
+import com.twb.poker.layout.WinnersDialog;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Random;
 
-public class PokerGameActivity extends AppCompatActivity implements PokerGameThread.PokerGameThreadCallback {
+public class PokerGameActivity extends AppCompatActivity
+        implements PokerGameThread.PokerGameThreadCallback {
     private static final int VIBRATE_LENGTH_IN_MS = 500;
 
     private PokerGameThread pokerGameThread;
     private LinearLayout pokerGameLinearLayout;
     private GridLayout controlsGridLayout;
+    private WinnersDialog winnersDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,12 +112,7 @@ public class PokerGameActivity extends AppCompatActivity implements PokerGameThr
     @Override
     protected void onResume() {
         super.onResume();
-        pokerGameLinearLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        setFullScreen();
     }
 
     @Override
@@ -148,5 +148,23 @@ public class PokerGameActivity extends AppCompatActivity implements PokerGameThr
         } else {
             vibrator.vibrate(VIBRATE_LENGTH_IN_MS);
         }
+    }
+
+    @Override
+    public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, Callback callback) {
+        if (winnersDialog != null) {
+            winnersDialog.dismissAllowingStateLoss();
+        }
+        winnersDialog = WinnersDialog.newInstance(pokerPlayerWinners, callback::onUserInput);
+        winnersDialog.show(getSupportFragmentManager());
+    }
+
+    private void setFullScreen() {
+        pokerGameLinearLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 }
