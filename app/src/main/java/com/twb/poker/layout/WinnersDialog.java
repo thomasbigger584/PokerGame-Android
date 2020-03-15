@@ -1,5 +1,6 @@
 package com.twb.poker.layout;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.twb.poker.R;
+import com.twb.poker.domain.Card;
+import com.twb.poker.domain.Hand;
 import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.domain.PokerPlayer;
 
@@ -48,7 +51,22 @@ public class WinnersDialog extends DialogFragment {
         TextView titleTextView = inflatedView.findViewById(R.id.titleTextView);
         titleTextView.setText(toastWinners());
 
+        CardLayout[] cardLayouts = new CardLayout[7];
+        cardLayouts[0] = inflatedView.findViewById(R.id.card1CardLayout);
+        cardLayouts[1] = inflatedView.findViewById(R.id.card2CardLayout);
+        cardLayouts[2] = inflatedView.findViewById(R.id.card3CardLayout);
+        cardLayouts[3] = inflatedView.findViewById(R.id.card4CardLayout);
+        cardLayouts[4] = inflatedView.findViewById(R.id.card5CardLayout);
+        cardLayouts[5] = inflatedView.findViewById(R.id.card6CardLayout);
+        cardLayouts[6] = inflatedView.findViewById(R.id.card7CardLayout);
 
+        PokerPlayer winningPokerPlayer = pokerPlayerWinnersList.get(0);
+        Hand winningHand = winningPokerPlayer.getHand();
+        for (int index = 0; index < cardLayouts.length; index++) {
+            CardLayout cardLayout = cardLayouts[index];
+            Card card = winningHand.get(index);
+            cardLayout.update(card);
+        }
         Button successButton = inflatedView.findViewById(R.id.successButton);
         successButton.setOnClickListener(v -> {
             if (listener != null) {
@@ -57,6 +75,14 @@ public class WinnersDialog extends DialogFragment {
             dismissAllowingStateLoss();
         });
         return inflatedView;
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if (listener != null) {
+            listener.onSuccessClick();
+        }
     }
 
     private String toastWinners() {

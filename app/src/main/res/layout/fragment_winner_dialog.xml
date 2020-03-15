@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="500dp"
-    android:layout_height="250dp"
+    android:layout_height="wrap_content"
     android:background="@color/colorPrimaryDark"
     android:minWidth="500dp"
-    android:minHeight="250dp"
     android:orientation="vertical"
     android:padding="32dp">
 
@@ -15,6 +14,12 @@
         android:text="Winners Dialog"
         android:textColor="@android:color/white" />
 
+    <include
+        layout="@layout/all_cards"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp" />
+
     <Button
         android:id="@+id/successButton"
         android:layout_width="wrap_content"
@@ -22,4 +27,4 @@
         android:layout_gravity="bottom|right"
         android:text="OK" />
 
-</FrameLayout>
+</LinearLayout>

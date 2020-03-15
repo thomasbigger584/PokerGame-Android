@@ -31,7 +31,7 @@ public class PokerGameThread extends Thread {
     private RoundState roundState;
     private PokerGameThreadCallback callback;
     private boolean turnButtonPressed = false;
-    private boolean winnerDialogOpened = false;
+    private boolean evalWaitingOnUserInput = false;
 
     PokerGameThread(PokerTable pokerTable, PokerGameThreadCallback callback) {
         setName(PokerGameThread.class.getSimpleName());
@@ -150,10 +150,10 @@ public class PokerGameThread extends Thread {
     private void eval() {
         List<PokerPlayer> pokerPlayerWinners =
                 pokerTable.evaluateAndGetWinners();
-        callback.onWinnerDialogShow(pokerPlayerWinners, () -> this.winnerDialogOpened = false);
-        do {
-            this.winnerDialogOpened = true;
-        } while (this.winnerDialogOpened);
+        callback.onWinnerDialogShow(pokerPlayerWinners,
+                () -> this.evalWaitingOnUserInput = false);
+        this.evalWaitingOnUserInput = true;
+        while (this.evalWaitingOnUserInput) ;
     }
 
     private void performPlayerBetTurn() {

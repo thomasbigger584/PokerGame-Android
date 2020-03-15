@@ -122,6 +122,15 @@ public class PokerTable extends ArrayList<PokerPlayer> {
                 handWinners.add(pokerPlayer);
             }
         }
+
+        //sort cards in hand in ascending order
+        for (PokerPlayer pokerPlayer : handWinners) {
+            Collections.sort(pokerPlayer.getHand(), (o1, o2) -> {
+                Integer o1Rank = o1.getRank();
+                Integer o2Rank = o2.getRank();
+                return o1Rank.compareTo(o2Rank);
+            });
+        }
         return handWinners;
     }
 
