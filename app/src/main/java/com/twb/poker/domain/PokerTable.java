@@ -1,12 +1,6 @@
-package com.twb.poker;
+package com.twb.poker.domain;
 
 
-import com.twb.poker.domain.Card;
-import com.twb.poker.domain.CommunityCardType;
-import com.twb.poker.domain.CommunityCards;
-import com.twb.poker.domain.Hand;
-import com.twb.poker.domain.PlayerBank;
-import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
 

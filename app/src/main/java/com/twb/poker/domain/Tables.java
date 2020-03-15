@@ -47,7 +47,7 @@ public class Tables {
     }
 
     public static void loadTables() {
-        // intentially empty
+        // intentionally empty
     }
 
     public static class Flushes {
