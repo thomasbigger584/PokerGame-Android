@@ -9,34 +9,33 @@ import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.DeckOfCardsFactory;
 import com.twb.poker.domain.PlayerUser;
-import com.twb.poker.domain.PokerGameState;
+import com.twb.poker.domain.RoundState;
+import com.twb.poker.util.SleepUtil;
 
 import java.util.List;
 
+import static com.twb.poker.util.SleepUtil.dealSleep;
+import static com.twb.poker.util.SleepUtil.gameDelaySleep;
+import static com.twb.poker.util.SleepUtil.playerTurnSleep;
+import static com.twb.poker.util.SleepUtil.roundDelaySleep;
+
 public class PokerGameThread extends Thread {
-    private static final double DEAL_TIME_IN_MS = 1.25 * 1000;
 
     private static final int PLAYER_RESPONSE_TIME_IN_SECONDS = 30;
 
-    private static final double PLAYER_RESPONSE_LOOP_UPDATE = 0.1d;
-
     private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
-
+    private static final int NUMBER_OF_GAMES_FOR_TESTING = 2;
     private final Handler uiHandler;
-
     private List<Card> deckOfCards;
-
     private PokerTable pokerTable;
-
     private int deckCardPointer;
-
-    private PokerGameState gameState;
-
+    private RoundState roundState;
     private PokerGameThreadCallback callback;
-
     private boolean turnButtonPressed = false;
+    private int gameCount = 0;
 
     PokerGameThread(PokerTable pokerTable, PokerGameThreadCallback callback) {
+        setName(PokerGameThread.class.getSimpleName());
         this.uiHandler = new Handler(Looper.getMainLooper());
         this.pokerTable = pokerTable;
         this.callback = callback;
@@ -44,57 +43,65 @@ public class PokerGameThread extends Thread {
 
     @Override
     public void run() {
+        while (gameCount <= NUMBER_OF_GAMES_FOR_TESTING) {
+            initGame();
 
-        initGame();
-
-        while (gameState != PokerGameState.FINISH) {
-            switch (gameState) {
-                case INIT_DEAL: {
-                    initDeal();
-                    break;
+            while (roundState != RoundState.FINISH) {
+                switch (roundState) {
+                    case INIT_DEAL: {
+                        initDeal();
+                        break;
+                    }
+                    case INIT_DEAL_BET: {
+                        initDealBet();
+                        break;
+                    }
+                    case FLOP_DEAL: {
+                        flopDeal();
+                        break;
+                    }
+                    case FLOP_DEAL_BET: {
+                        flopDealBet();
+                        break;
+                    }
+                    case RIVER_DEAL: {
+                        riverDeal();
+                        break;
+                    }
+                    case RIVER_DEAL_BET: {
+                        riverDealBet();
+                        break;
+                    }
+                    case TURN_DEAL: {
+                        turnDeal();
+                        break;
+                    }
+                    case TURN_DEAL_BET: {
+                        turnDealBet();
+                        break;
+                    }
+                    case EVAL: {
+                        eval();
+                        break;
+                    }
                 }
-                case INIT_DEAL_BET: {
-                    initDealBet();
-                    break;
-                }
-                case FLOP_DEAL: {
-                    flopDeal();
-                    break;
-                }
-                case FLOP_DEAL_BET: {
-                    flopDealBet();
-                    break;
-                }
-                case RIVER_DEAL: {
-                    riverDeal();
-                    break;
-                }
-                case RIVER_DEAL_BET: {
-                    riverDealBet();
-                    break;
-                }
-                case TURN_DEAL: {
-                    turnDeal();
-                    break;
-                }
-                case TURN_DEAL_BET: {
-                    turnDealBet();
-                    break;
-                }
-                case EVAL: {
-                    eval();
-                    break;
-                }
+                roundState = roundState.nextState();
             }
-            gameState = gameState.nextState();
+            finishRound();
         }
+        finishGame();
     }
 
     private void initGame() {
-        this.pokerTable = this.pokerTable.reorderPokerTableForDealer();
-        this.deckOfCards = DeckOfCardsFactory.getCards(true);
+        this.pokerTable.reset();
+        this.gameCount++;
+
+        this.pokerTable = this.pokerTable.reassignPokerTableForDealer();
+
         this.deckCardPointer = 0;
-        this.gameState = PokerGameState.INIT_DEAL;
+        this.roundState = RoundState.INIT_DEAL;
+        this.deckOfCards = DeckOfCardsFactory.getCards(true);
+
         this.pokerTable.initPokerTable();
     }
 
@@ -148,20 +155,25 @@ public class PokerGameThread extends Thread {
         if (pokerPlayerWinners.size() == 1) {
             PokerPlayer winningPokerPlayer = pokerPlayerWinners.get(0);
             PlayerUser playerUser = winningPokerPlayer.getPlayerUser();
-            toast("Winner is " + playerUser.getDisplayName() + " with : " + winningPokerPlayer.getHand());
+            toast("Winner is " + playerUser.getDisplayName() +
+                    " with : " + winningPokerPlayer.getHand());
         } else {
-            toast("Split pot");
+            StringBuilder winnersString = new StringBuilder();
+            for (int index = 0; index < pokerPlayerWinners.size(); index++) {
+                PokerPlayer winningPokerPlayer = pokerPlayerWinners.get(index);
+                String displayName = winningPokerPlayer.getPlayerUser().getDisplayName();
+                winnersString.append(displayName);
+                if (index != pokerPlayerWinners.size() - 1) {
+                    winnersString.append(", ");
+                }
+            }
+            toast("Split pot: " + winnersString.toString());
         }
     }
 
     private void performPlayerBetTurn() {
         for (int index = 0; index < pokerTable.size(); index++) {
-            PokerPlayer prevPokerPlayer;
-            if (index == 0) {
-                prevPokerPlayer = pokerTable.get(pokerTable.size() - 1);
-            } else {
-                prevPokerPlayer = pokerTable.get(index - 1);
-            }
+            PokerPlayer prevPokerPlayer = pokerTable.getPrevious(index);
             PokerPlayer thisPokerPlayer = pokerTable.get(index);
             prevPokerPlayer.setTurnPlayer(false);
             thisPokerPlayer.setTurnPlayer(true);
@@ -175,7 +187,7 @@ public class PokerGameThread extends Thread {
                 this.turnButtonPressed = false;
 
                 for (double turnSecondsLeft = PLAYER_RESPONSE_TIME_IN_SECONDS; turnSecondsLeft >= 0;
-                     turnSecondsLeft = turnSecondsLeft - PLAYER_RESPONSE_LOOP_UPDATE) {
+                     turnSecondsLeft = turnSecondsLeft - SleepUtil.PLAYER_RESPONSE_LOOP_IN_SECONDS) {
 
                     final int secondsleft = (int) turnSecondsLeft;
                     uiHandler.post(() -> {
@@ -189,6 +201,7 @@ public class PokerGameThread extends Thread {
                     }
                     if (turnSecondsLeft == 0) {
                         //force fold here
+                        toast("Force Fold");
                     }
                     playerTurnSleep();
                 }
@@ -209,20 +222,17 @@ public class PokerGameThread extends Thread {
         dealSleep();
     }
 
-    private void dealSleep() {
-        try {
-            sleep(Math.round(DEAL_TIME_IN_MS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private void finishRound() {
+        toast("Round finished");
+
+        roundDelaySleep();
     }
 
-    private void playerTurnSleep() {
-        try {
-            sleep(Math.round(PLAYER_RESPONSE_LOOP_UPDATE * 1000));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private void finishGame() {
+
+        toast("Game Finished");
+
+        gameDelaySleep();
     }
 
     private void toast(final String message) {

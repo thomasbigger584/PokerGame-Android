@@ -41,6 +41,15 @@ public class CommunityCardLayout extends FrameLayout {
         setInvisible();
     }
 
+    public void reset() {
+        setInvisible();
+        community1CardLayout.reset();
+        community2CardLayout.reset();
+        community3CardLayout.reset();
+        community4CardLayout.reset();
+        community5CardLayout.reset();
+    }
+
     public void dealCard(final Card card, CommunityCardType cardType) {
         switch (cardType) {
             case FLOP_1: {

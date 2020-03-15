@@ -21,15 +21,15 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     private final CommunityCardLayout communityCardLayout;
     private final CommunityCards communityCards;
 
+    public PokerTable(CommunityCardLayout communityCardLayout) {
+        this.communityCardLayout = communityCardLayout;
+        this.communityCards = new CommunityCards();
+    }
+
     public void initPokerTable() {
         for (PokerPlayer pokerPlayer : this) {
             pokerPlayer.updatePokerPlayerOnTable();
         }
-    }
-
-    public PokerTable(CommunityCardLayout communityCardLayout) {
-        this.communityCardLayout = communityCardLayout;
-        this.communityCards = new CommunityCards();
     }
 
     public void dealCommunityCard(final Card card, CommunityCardType cardType) {
@@ -47,7 +47,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         add(pokerPlayer);
     }
 
-    public PokerTable reorderPokerTableForDealer() {
+    public PokerTable reassignPokerTableForDealer() {
         int dealerIndex = getDealerIndex();
 
         if (dealerIndex == NO_DEALER) {
@@ -85,6 +85,25 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         return NO_DEALER;
     }
 
+    //todo might need revisited / test this actually rotates
+    public void rotateDealer() {
+        for (int index = 0; index < size(); index++) {
+            PokerPlayer player = get(index);
+            if (player.isDealerPlayer()) {
+                if (index == size() - 1) {
+                    PokerPlayer firstPlayer = get(0);
+                    firstPlayer.setDealerPlayer(true);
+                } else {
+                    PokerPlayer nextPlayer = get(index + 1);
+                    nextPlayer.setDealerPlayer(true);
+                }
+                player.setDealerPlayer(false);
+                break;
+            }
+        }
+    }
+
+    // return a list as there could be a winning tie
     public List<PokerPlayer> evaluateAndGetWinners() {
         List<Card> playableCards = communityCards.getPlayableCards();
         for (PokerPlayer pokerPlayer : this) {
@@ -107,5 +126,21 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             }
         }
         return handWinners;
+    }
+
+    public PokerPlayer getPrevious(int index) {
+        if (index == 0) {
+            return get(size() - 1);
+        } else {
+            return get(index - 1);
+        }
+    }
+
+    public void reset() {
+        communityCardLayout.reset();
+        communityCards.reset();
+        for (PokerPlayer pokerPlayer : this) {
+            pokerPlayer.reset();
+        }
     }
 }

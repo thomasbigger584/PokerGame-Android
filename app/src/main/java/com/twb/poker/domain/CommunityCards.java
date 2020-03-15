@@ -44,4 +44,8 @@ public class CommunityCards extends ArrayList<Card> {
         cards.add(getBurnPreTurn());
         return cards;
     }
+
+    public void reset() {
+        clear();
+    }
 }

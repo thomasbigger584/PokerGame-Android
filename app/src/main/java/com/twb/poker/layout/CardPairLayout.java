@@ -38,19 +38,25 @@ public class CardPairLayout extends FrameLayout {
         clear();
     }
 
-    public void clear() {
+    public void reset() {
+        post(this::clear);
+    }
+
+    private void clear() {
         for (ImageView imageView : cardImageViews) {
             imageView.setVisibility(INVISIBLE);
         }
+        dealerChipLayout.setVisibility(GONE);
     }
 
     public void updateCardImageView(final Card card) {
         post(() -> {
-            int cardDrawResId = CardToCardDrawableUtil.getDrawableResFromCard(getContext(), card);
+            int cardDrawResId = CardToCardDrawableUtil.
+                    getDrawableResFromCard(getContext(), card);
 
             if (cardImageViews[0].getVisibility() != INVISIBLE &&
                     cardImageViews[1].getVisibility() != INVISIBLE) {
-                clear();
+                reset();
             }
             if (cardImageViews[0].getVisibility() == INVISIBLE) {
                 cardImageViews[0].setImageResource(cardDrawResId);

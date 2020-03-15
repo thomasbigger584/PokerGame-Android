@@ -24,6 +24,8 @@ import java.math.RoundingMode;
 import java.util.Random;
 
 public class PokerGameActivity extends AppCompatActivity implements PokerGameThread.PokerGameThreadCallback {
+    private static final int VIBRATE_LENGTH_IN_MS = 500;
+
     private PokerGameThread pokerGameThread;
     private LinearLayout pokerGameLinearLayout;
     private GridLayout controlsGridLayout;
@@ -141,9 +143,9 @@ public class PokerGameActivity extends AppCompatActivity implements PokerGameThr
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+            vibrator.vibrate(VibrationEffect.createOneShot(VIBRATE_LENGTH_IN_MS, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
-            vibrator.vibrate(500);
+            vibrator.vibrate(VIBRATE_LENGTH_IN_MS);
         }
     }
 }

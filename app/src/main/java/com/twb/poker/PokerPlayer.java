@@ -43,6 +43,11 @@ public class PokerPlayer {
         cardPairLayout.updateTurnPlayer(turnPlayer);
     }
 
+    public void reset() {
+        this.hand = new Hand();
+        cardPairLayout.reset();
+    }
+
     public CardPairLayout getCardPairLayout() {
         return this.cardPairLayout;
     }

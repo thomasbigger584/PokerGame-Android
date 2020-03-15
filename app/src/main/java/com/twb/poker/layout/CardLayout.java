@@ -24,7 +24,7 @@ public class CardLayout extends FrameLayout {
     private void init() {
         View inflatedView = inflate(getContext(), R.layout.card, this);
         cardImageView = inflatedView.findViewById(R.id.cardImageView);
-        clear();
+        reset();
     }
 
     public void update(final Card card) {
@@ -35,8 +35,10 @@ public class CardLayout extends FrameLayout {
         });
     }
 
-    public void clear() {
-        cardImageView.setImageDrawable(null);
-        cardImageView.setVisibility(INVISIBLE);
+    public void reset() {
+        post(() -> {
+            cardImageView.setImageDrawable(null);
+            cardImageView.setVisibility(INVISIBLE);
+        });
     }
 }
