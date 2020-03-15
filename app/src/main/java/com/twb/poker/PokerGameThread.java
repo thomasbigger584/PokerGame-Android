@@ -20,11 +20,9 @@ import static com.twb.poker.util.SleepUtil.playerTurnSleep;
 import static com.twb.poker.util.SleepUtil.roundDelaySleep;
 
 public class PokerGameThread extends Thread {
-
     private static final int PLAYER_RESPONSE_TIME_IN_SECONDS = 30;
-
     private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
-    private static final int NUMBER_OF_GAMES_FOR_TESTING = 2;
+
     private final Handler uiHandler;
     private List<Card> deckOfCards;
     private PokerTable pokerTable;
@@ -32,7 +30,6 @@ public class PokerGameThread extends Thread {
     private RoundState roundState;
     private PokerGameThreadCallback callback;
     private boolean turnButtonPressed = false;
-    private int gameCount = 0;
 
     PokerGameThread(PokerTable pokerTable, PokerGameThreadCallback callback) {
         setName(PokerGameThread.class.getSimpleName());
@@ -43,9 +40,7 @@ public class PokerGameThread extends Thread {
 
     @Override
     public void run() {
-        //would need to be while pokerTable is not empty
-        //when we have betting and elimination
-        while (gameCount <= NUMBER_OF_GAMES_FOR_TESTING) {
+        while (!pokerTable.isEmpty()) {
             initGame();
 
             while (roundState != RoundState.FINISH) {
@@ -96,7 +91,6 @@ public class PokerGameThread extends Thread {
 
     private void initGame() {
         this.pokerTable.reset();
-        this.gameCount++;
 
         this.pokerTable = this.pokerTable.reassignPokerTableForDealer();
 
@@ -225,6 +219,8 @@ public class PokerGameThread extends Thread {
     }
 
     private void finishRound() {
+        this.pokerTable.rotateDealer();
+
         toast("Round finished");
 
         roundDelaySleep();
