@@ -1,5 +1,10 @@
 package com.twb.poker.domain;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum CommunityCardType {
     NONE(-1),
     BURN_PRE_FLOP(0),
@@ -12,10 +17,6 @@ public enum CommunityCardType {
     TURN(7);
 
     private final int position;
-
-    CommunityCardType(final int position) {
-        this.position = position;
-    }
 
     public static CommunityCardType ofPosition(int position) {
         switch (position) {
@@ -45,10 +46,6 @@ public enum CommunityCardType {
             }
         }
         return NONE;
-    }
-
-    public int getPosition() {
-        return this.position;
     }
 
     public boolean isBurn() {

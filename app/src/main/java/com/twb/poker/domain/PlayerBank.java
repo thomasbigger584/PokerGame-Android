@@ -1,28 +1,14 @@
 package com.twb.poker.domain;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@Data
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class PlayerBank {
-
-    private double funds = 100d;
-
-    public PlayerBank(double funds) {
-        this.funds = funds;
-    }
-
-    public double getFunds() {
-        return funds;
-    }
-
-    public void setFunds(double funds) {
-        this.funds = funds;
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return "{" +
-                "funds=" + funds +
-                '}';
-    }
+    private double funds;
 }

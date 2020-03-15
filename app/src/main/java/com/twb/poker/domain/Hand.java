@@ -7,7 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+
 // first 2 cards are player cards
+@Getter
 public class Hand extends ArrayList<Card> implements Comparable<Hand> {
 
     private Integer rank;
@@ -16,10 +19,6 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         for (int index = 0; index < 2; index++) {
             add(null);
         }
-    }
-
-    public Integer getRank() {
-        return rank;
     }
 
     public void setCommunityCards(List<Card> playableCards) {

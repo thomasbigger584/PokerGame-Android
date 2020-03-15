@@ -42,7 +42,7 @@ public class PokerGameThread extends Thread {
 
     @Override
     public void run() {
-        while (!pokerTable.isEmpty()) {
+        while (pokerTable.size() > 1) {
             initGame();
 
             while (roundState != RoundState.FINISH) {

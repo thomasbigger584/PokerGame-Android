@@ -37,7 +37,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
                           double funds, boolean currentPlayer) {
         PlayerBank playerBank = new PlayerBank(funds);
         PlayerUser playerUser = new PlayerUser(displayName, playerBank);
-        PokerPlayer pokerPlayer = new PokerPlayer(cardPairLayout, playerUser, currentPlayer);
+        PokerPlayer pokerPlayer = new PokerPlayer(playerUser, cardPairLayout, currentPlayer);
         add(pokerPlayer);
     }
 

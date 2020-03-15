@@ -1,36 +1,15 @@
 package com.twb.poker.domain;
 
-public class PlayerUser {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@Data
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+public class PlayerUser {
     private String displayName;
     private PlayerBank bank;
-
-    public PlayerUser(String displayName, PlayerBank bank) {
-        this.displayName = displayName;
-        this.bank = bank;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public PlayerBank getBank() {
-        return bank;
-    }
-
-    public void setBank(PlayerBank bank) {
-        this.bank = bank;
-    }
-
-    @Override
-    public String toString() {
-        return "{" +
-                "displayName='" + displayName + '\'' +
-                ", bank=" + bank +
-                '}';
-    }
 }
