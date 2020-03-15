@@ -1,4 +1,4 @@
-package com.twb.poker.layout;
+package com.twb.poker.util;
 
 import android.content.Context;
 import android.content.res.Resources;

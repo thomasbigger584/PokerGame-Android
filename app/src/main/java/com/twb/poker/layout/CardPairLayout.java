@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.twb.poker.R;
 import com.twb.poker.domain.Card;
+import com.twb.poker.util.CardToCardDrawableUtil;
 
 import java.util.Locale;
 
