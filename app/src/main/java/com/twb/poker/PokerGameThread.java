@@ -43,6 +43,8 @@ public class PokerGameThread extends Thread {
 
     @Override
     public void run() {
+        //would need to be while pokerTable is not empty
+        //when we have betting and elimination
         while (gameCount <= NUMBER_OF_GAMES_FOR_TESTING) {
             initGame();
 

@@ -25,4 +25,12 @@ public class PlayerUser {
     public void setBank(PlayerBank bank) {
         this.bank = bank;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "displayName='" + displayName + '\'' +
+                ", bank=" + bank +
+                '}';
+    }
 }

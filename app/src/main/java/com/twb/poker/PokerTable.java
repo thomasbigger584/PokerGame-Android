@@ -106,12 +106,15 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     // return a list as there could be a winning tie
     public List<PokerPlayer> evaluateAndGetWinners() {
         List<Card> playableCards = communityCards.getPlayableCards();
-        for (PokerPlayer pokerPlayer : this) {
+
+        //using copy as dont want to sort the existing table.
+        List<PokerPlayer> copyPokerTable = new ArrayList<>(this);
+        for (PokerPlayer pokerPlayer : copyPokerTable) {
             Hand hand = pokerPlayer.getHand();
             hand.setCommunityCards(playableCards);
             hand.calculateRank();
         }
-        Collections.sort(this, (o1, o2) -> {
+        Collections.sort(copyPokerTable, (o1, o2) -> {
             Hand o1Hand = o1.getHand();
             Hand o2Hand = o2.getHand();
             return o2Hand.compareTo(o1Hand);
@@ -119,7 +122,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
 
         List<PokerPlayer> handWinners = new ArrayList<>();
         int winningRankValue = get(0).getHand().getRank();
-        for (PokerPlayer pokerPlayer : this) {
+        for (PokerPlayer pokerPlayer : copyPokerTable) {
             Hand hand = pokerPlayer.getHand();
             if (hand.getRank() == winningRankValue) {
                 handWinners.add(pokerPlayer);
