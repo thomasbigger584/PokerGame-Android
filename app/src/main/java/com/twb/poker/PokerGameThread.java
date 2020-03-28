@@ -153,6 +153,7 @@ public class PokerGameThread extends Thread {
         callback.onWinnerDialogShow(pokerPlayerWinners,
                 () -> this.evalWaitingOnUserInput = false);
         this.evalWaitingOnUserInput = true;
+        //noinspection StatementWithEmptyBody
         while (this.evalWaitingOnUserInput) ;
     }
 

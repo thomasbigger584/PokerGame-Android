@@ -18,8 +18,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.github.javafaker.Faker;
 import com.twb.poker.domain.PokerPlayer;
 import com.twb.poker.domain.PokerTable;
+import com.twb.poker.layout.BetRaiseDialog;
 import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
+import com.twb.poker.layout.PokerDialog;
 import com.twb.poker.layout.WinnersDialog;
 
 import java.math.BigDecimal;
@@ -34,7 +36,7 @@ public class PokerGameActivity extends AppCompatActivity
     private PokerGameThread pokerGameThread;
     private LinearLayout pokerGameLinearLayout;
     private GridLayout controlsGridLayout;
-    private WinnersDialog winnersDialog;
+    private PokerDialog pokerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +73,11 @@ public class PokerGameActivity extends AppCompatActivity
             pokerGameThread.setTurnButtonPressed();
         });
         Button betButton = controlsGridLayout.findViewById(R.id.betButton);
-        betButton.setOnClickListener(v -> {
-            pokerGameThread.setTurnButtonPressed();
-        });
+        betButton.setOnClickListener(v -> showBetDialog());
+
         Button raiseButton = controlsGridLayout.findViewById(R.id.raiseButton);
         raiseButton.setOnClickListener(v -> {
-            pokerGameThread.setTurnButtonPressed();
+            showRaiseDialog();
         });
 
         PokerTable pokerTable = new PokerTable(communityCardLayout);
@@ -152,11 +153,38 @@ public class PokerGameActivity extends AppCompatActivity
 
     @Override
     public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, Callback callback) {
-        if (winnersDialog != null) {
-            winnersDialog.dismissAllowingStateLoss();
+        dismissPokerDialog();
+        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, callback::onUserInput);
+        pokerDialog.show(getSupportFragmentManager(), WinnersDialog.class);
+    }
+
+    private void showBetDialog() {
+        dismissPokerDialog();
+        pokerDialog = BetRaiseDialog.newInstance(new PokerDialog.OnDialogClickListener() {
+            @Override
+            public void onSuccessClick() {
+
+            }
+        });
+        pokerDialog.show(getSupportFragmentManager(), BetRaiseDialog.class);
+    }
+
+    private void showRaiseDialog() {
+        dismissPokerDialog();
+        pokerDialog = BetRaiseDialog.newInstance(new PokerDialog.OnDialogClickListener() {
+            @Override
+            public void onSuccessClick() {
+
+            }
+        });
+        pokerDialog.show(getSupportFragmentManager(), BetRaiseDialog.class);
+    }
+
+    private void dismissPokerDialog() {
+        if (pokerDialog != null) {
+            pokerDialog.dismissAllowingStateLoss();
+            pokerDialog = null;
         }
-        winnersDialog = WinnersDialog.newInstance(pokerPlayerWinners, callback::onUserInput);
-        winnersDialog.show(getSupportFragmentManager());
     }
 
     private void setFullScreen() {
