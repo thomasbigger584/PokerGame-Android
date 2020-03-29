@@ -4,7 +4,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -28,6 +27,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Random;
+
+import static com.twb.poker.layout.BetRaiseDialog.DialogType.BET;
+import static com.twb.poker.layout.BetRaiseDialog.DialogType.RAISE;
 
 public class PokerGameActivity extends AppCompatActivity
         implements PokerGameThread.PokerGameThreadCallback {
@@ -123,7 +125,7 @@ public class PokerGameActivity extends AppCompatActivity
 
     @Override
     public void onSecondsLeft(int secondsLeft) {
-        Log.e(PokerGameActivity.class.getName(), "onSecondsLeft: " + secondsLeft);
+//        Log.e(PokerGameActivity.class.getName(), "onSecondsLeft: " + secondsLeft);
     }
 
     @Override
@@ -155,29 +157,23 @@ public class PokerGameActivity extends AppCompatActivity
     public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, Callback callback) {
         dismissPokerDialog();
         pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, callback::onUserInput);
-        pokerDialog.show(getSupportFragmentManager(), WinnersDialog.class);
+        pokerDialog.show(getSupportFragmentManager());
     }
 
     private void showBetDialog() {
         dismissPokerDialog();
-        pokerDialog = BetRaiseDialog.newInstance(new PokerDialog.OnDialogClickListener() {
-            @Override
-            public void onSuccessClick() {
+        pokerDialog = BetRaiseDialog.newInstance(BET, () -> {
 
-            }
         });
-        pokerDialog.show(getSupportFragmentManager(), BetRaiseDialog.class);
+        pokerDialog.show(getSupportFragmentManager());
     }
 
     private void showRaiseDialog() {
         dismissPokerDialog();
-        pokerDialog = BetRaiseDialog.newInstance(new PokerDialog.OnDialogClickListener() {
-            @Override
-            public void onSuccessClick() {
+        pokerDialog = BetRaiseDialog.newInstance(RAISE, () -> {
 
-            }
         });
-        pokerDialog.show(getSupportFragmentManager(), BetRaiseDialog.class);
+        pokerDialog.show(getSupportFragmentManager());
     }
 
     private void dismissPokerDialog() {

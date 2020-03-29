@@ -51,8 +51,8 @@ public class PokerDialog extends DialogFragment {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
-    public void show(FragmentManager manager, Class baseClass) {
-        super.show(manager, baseClass.getSimpleName());
+    public void show(FragmentManager manager) {
+        super.show(manager, getClass().getSimpleName());
     }
 
     public interface OnDialogClickListener {
