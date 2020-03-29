@@ -16,9 +16,12 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     private final CommunityCardLayout communityCardLayout;
     private final CommunityCards communityCards;
 
+    private final Pot pot;
+
     public PokerTable(CommunityCardLayout communityCardLayout) {
         this.communityCardLayout = communityCardLayout;
         this.communityCards = new CommunityCards();
+        this.pot = new Pot();
     }
 
     public void initPokerTable() {

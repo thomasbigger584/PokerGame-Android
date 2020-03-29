@@ -2,6 +2,8 @@ package com.twb.poker.domain;
 
 import com.twb.poker.layout.CardPairLayout;
 
+import java.util.UUID;
+
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -10,6 +12,8 @@ import lombok.ToString;
 @ToString
 @RequiredArgsConstructor
 public class PokerPlayer {
+    private final String id = UUID.randomUUID().toString();
+
     private final PlayerUser playerUser;
 
     private final CardPairLayout cardPairLayout;
