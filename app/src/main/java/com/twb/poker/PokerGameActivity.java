@@ -11,6 +11,7 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,7 +33,7 @@ import static com.twb.poker.layout.BetRaiseDialog.DialogType.BET;
 import static com.twb.poker.layout.BetRaiseDialog.DialogType.RAISE;
 
 public class PokerGameActivity extends AppCompatActivity
-        implements PokerGameThread.PokerGameThreadCallback {
+        implements PokerGameThread.PokerGameThreadCallback, Thread.UncaughtExceptionHandler {
     private static final int VIBRATE_LENGTH_IN_MS = 500;
 
     private PokerGameThread pokerGameThread;
@@ -91,8 +92,8 @@ public class PokerGameActivity extends AppCompatActivity
         pokerTable.addPlayer(tablePlayer4CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
         pokerTable.addPlayer(tablePlayer5CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
 
-        PokerGameThread.PokerGameThreadCallback thisCallback = this;
-        pokerGameThread = new PokerGameThread(pokerTable, thisCallback);
+        pokerGameThread = new PokerGameThread(pokerTable, this);
+        pokerGameThread.setUncaughtExceptionHandler(this);
     }
 
     private String generateRandomName() {
@@ -191,5 +192,10 @@ public class PokerGameActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    @Override
+    public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
+        toast(e.getMessage());
     }
 }
