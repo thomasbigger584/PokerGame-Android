@@ -27,6 +27,7 @@ public class WinnersDialog extends PokerDialog {
         fragment.listener = listener;
         fragment.pokerPlayerWinnersList = pokerPlayerWinnerList;
         fragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+        fragment.setCancelable(false);
         Bundle bundle = new Bundle();
         fragment.setArguments(bundle);
         return fragment;

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 public class PokerTable extends ArrayList<PokerPlayer> {
+    private static final String TAG = PokerTable.class.getSimpleName();
     private static final int NO_DEALER = -1;
 
     private final CommunityCardLayout communityCardLayout;
@@ -115,7 +116,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         });
 
         List<PokerPlayer> handWinners = new ArrayList<>();
-        int winningRankValue = get(0).getHand().getRank();
+        int winningRankValue = copyPokerTable.get(0).getHand().getRank();
         for (PokerPlayer pokerPlayer : copyPokerTable) {
             Hand hand = pokerPlayer.getHand();
             if (hand.getRank() == winningRankValue) {
