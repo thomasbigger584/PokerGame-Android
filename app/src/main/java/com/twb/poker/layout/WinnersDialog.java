@@ -19,9 +19,10 @@ import com.twb.poker.domain.PokerPlayer;
 import java.util.List;
 
 public class WinnersDialog extends PokerDialog {
+    private WinnersClickListener listener;
     private List<PokerPlayer> pokerPlayerWinnersList;
 
-    public static WinnersDialog newInstance(List<PokerPlayer> pokerPlayerWinnerList, PokerDialog.OnDialogClickListener listener) {
+    public static WinnersDialog newInstance(List<PokerPlayer> pokerPlayerWinnerList, WinnersClickListener listener) {
         WinnersDialog fragment = new WinnersDialog();
         fragment.listener = listener;
         fragment.pokerPlayerWinnersList = pokerPlayerWinnerList;
@@ -57,7 +58,12 @@ public class WinnersDialog extends PokerDialog {
             cardLayout.update(card);
         }
         Button successButton = inflatedView.findViewById(R.id.successButton);
-        successButton.setOnClickListener(v -> successClick());
+        successButton.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onSuccessClick();
+            }
+            dismissAllowingStateLoss();
+        });
         return inflatedView;
     }
 
@@ -79,5 +85,9 @@ public class WinnersDialog extends PokerDialog {
             }
             return "Split pot: " + winnersString.toString();
         }
+    }
+
+    public interface WinnersClickListener {
+        void onSuccessClick();
     }
 }

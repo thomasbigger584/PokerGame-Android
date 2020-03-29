@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -18,14 +19,15 @@ import java.util.Locale;
 
 public class BetRaiseDialog extends PokerDialog {
     private static final float PLAYER_BANK_AMOUNT = 2871.23f;
+    private BetRaiseClickListener betRaiseListener;
     private DialogType type;
     private TextView titleTextView;
     private SeekBar betRaiseSeekBar;
     private float amountSelected;
 
-    public static BetRaiseDialog newInstance(DialogType type, PokerDialog.OnDialogClickListener listener) {
+    public static BetRaiseDialog newInstance(DialogType type, BetRaiseClickListener listener) {
         BetRaiseDialog fragment = new BetRaiseDialog();
-        fragment.listener = listener;
+        fragment.betRaiseListener = listener;
         fragment.type = type;
         fragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
         Bundle bundle = new Bundle();
@@ -45,6 +47,13 @@ public class BetRaiseDialog extends PokerDialog {
             @Override
             public void onProgressChanged(int progress) {
                 setTitleTextView(((float) progress) / 100f);
+            }
+        });
+
+        Button successButton = inflatedView.findViewById(R.id.successButton);
+        successButton.setOnClickListener(v -> {
+            if (betRaiseListener != null) {
+                betRaiseListener.onAmountSelected(amountSelected);
             }
         });
 
@@ -88,5 +97,9 @@ public class BetRaiseDialog extends PokerDialog {
 
     public enum DialogType {
         BET, RAISE
+    }
+
+    public interface BetRaiseClickListener {
+        void onAmountSelected(float amount);
     }
 }

@@ -135,6 +135,7 @@ public class PokerGameActivity extends AppCompatActivity
 
     @Override
     public void onControlsHide() {
+        dismissPokerDialog();
         if (controlsGridLayout.getVisibility() != View.GONE) {
             controlsGridLayout.setVisibility(View.GONE);
         }
@@ -154,15 +155,15 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     @Override
-    public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, Callback callback) {
+    public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, UserInputCallback userInputCallback) {
         dismissPokerDialog();
-        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, callback::onUserInput);
+        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, userInputCallback::onUserInput);
         pokerDialog.show(getSupportFragmentManager());
     }
 
     private void showBetDialog() {
         dismissPokerDialog();
-        pokerDialog = BetRaiseDialog.newInstance(BET, () -> {
+        pokerDialog = BetRaiseDialog.newInstance(BET, amount -> {
 
         });
         pokerDialog.show(getSupportFragmentManager());
@@ -170,7 +171,7 @@ public class PokerGameActivity extends AppCompatActivity
 
     private void showRaiseDialog() {
         dismissPokerDialog();
-        pokerDialog = BetRaiseDialog.newInstance(RAISE, () -> {
+        pokerDialog = BetRaiseDialog.newInstance(RAISE, amount -> {
 
         });
         pokerDialog.show(getSupportFragmentManager());

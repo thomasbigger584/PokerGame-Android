@@ -1,6 +1,5 @@
 package com.twb.poker.layout;
 
-import android.content.DialogInterface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -10,8 +9,6 @@ import androidx.fragment.app.FragmentManager;
 
 public class PokerDialog extends DialogFragment {
     private static final float DIM_AMOUNT = 0.5f;
-
-    PokerDialog.OnDialogClickListener listener;
 
     View inflatedView;
 
@@ -27,21 +24,6 @@ public class PokerDialog extends DialogFragment {
         }
     }
 
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
-        if (listener != null) {
-            listener.onSuccessClick();
-        }
-    }
-
-    void successClick() {
-        if (listener != null) {
-            listener.onSuccessClick();
-        }
-        dismissAllowingStateLoss();
-    }
-
     void setFullScreen() {
         inflatedView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -53,9 +35,5 @@ public class PokerDialog extends DialogFragment {
 
     public void show(FragmentManager manager) {
         super.show(manager, getClass().getSimpleName());
-    }
-
-    public interface OnDialogClickListener {
-        void onSuccessClick();
     }
 }

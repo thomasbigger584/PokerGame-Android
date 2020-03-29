@@ -2,6 +2,7 @@ package com.twb.poker;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.MainThread;
 
@@ -21,6 +22,7 @@ import static com.twb.poker.util.SleepUtil.playerTurnSleep;
 import static com.twb.poker.util.SleepUtil.roundDelaySleep;
 
 public class PokerGameThread extends Thread {
+    private static final String TAG = PokerGameThread.class.getSimpleName();
     private static final int PLAYER_RESPONSE_TIME_IN_SECONDS = 30;
     private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
 
@@ -185,9 +187,12 @@ public class PokerGameThread extends Thread {
                         });
                         break;
                     }
-                    if (turnSecondsLeft == 0) {
-                        //force fold here
-                        toast("Force Fold");
+
+                    if (turnSecondsLeft - SleepUtil.PLAYER_RESPONSE_LOOP_IN_SECONDS <= 0) {
+                        Log.e(TAG, "Force Fold");
+                        uiHandler.post(() -> {
+                            callback.onControlsHide();
+                        });
                     }
                     playerTurnSleep();
                 }
@@ -243,9 +248,9 @@ public class PokerGameThread extends Thread {
 
         void onVibrate();
 
-        void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, Callback callback);
+        void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, UserInputCallback userInputCallback);
 
-        interface Callback {
+        interface UserInputCallback {
             void onUserInput();
         }
     }
