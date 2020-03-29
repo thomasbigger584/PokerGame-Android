@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.javafaker.Faker;
@@ -40,6 +39,7 @@ public class PokerGameActivity extends AppCompatActivity
     private LinearLayout pokerGameLinearLayout;
     private GridLayout controlsGridLayout;
     private PokerDialog pokerDialog;
+    private PokerTable pokerTable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,17 +83,13 @@ public class PokerGameActivity extends AppCompatActivity
             showRaiseDialog();
         });
 
-        PokerTable pokerTable = new PokerTable(communityCardLayout);
+        pokerTable = new PokerTable(communityCardLayout);
         pokerTable.addPlayer(playerCardPairLayout, "Thomas", generateRandomFunds(100, 300), true);
-
         pokerTable.addPlayer(tablePlayer1CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
         pokerTable.addPlayer(tablePlayer2CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
         pokerTable.addPlayer(tablePlayer3CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
         pokerTable.addPlayer(tablePlayer4CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
         pokerTable.addPlayer(tablePlayer5CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
-
-        pokerGameThread = new PokerGameThread(pokerTable, this);
-        pokerGameThread.setUncaughtExceptionHandler(this);
     }
 
     private String generateRandomName() {
@@ -107,16 +103,28 @@ public class PokerGameActivity extends AppCompatActivity
         return bd.doubleValue();
     }
 
-    @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        pokerGameThread.start();
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
         setFullScreen();
+        checkThreadLife();
+    }
+
+    private void checkThreadLife() {
+        if (pokerGameThread != null) {
+            if (!pokerGameThread.isAlive()) {
+                pokerGameThread.start();
+            }
+        } else {
+            createPokerGameThread(pokerTable);
+            pokerGameThread.start();
+        }
+    }
+
+    private void createPokerGameThread(PokerTable pokerTable) {
+        pokerGameThread = new PokerGameThread(pokerTable, this);
+        pokerGameThread.setUncaughtExceptionHandler(this);
     }
 
     @Override
