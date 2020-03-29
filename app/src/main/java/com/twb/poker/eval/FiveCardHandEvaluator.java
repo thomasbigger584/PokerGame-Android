@@ -5,7 +5,9 @@ import com.twb.poker.domain.Tables;
 
 import java.util.Arrays;
 
-/** Utility methods for evaluating or creating a hand of cards. */
+/**
+ * Utility methods for evaluating or creating a hand of cards.
+ */
 public abstract class FiveCardHandEvaluator {
     /**
      * Private constructor to disable instantiation of an abstract class.
@@ -17,6 +19,7 @@ public abstract class FiveCardHandEvaluator {
     /**
      * Evaluates the given hand and returns its value as an integer.
      * Based on Kevin Suffecool's 5-card hand evaluator and with Paul Senzee's pre-computed hash.
+     *
      * @param cards a hand of cards to evaluate
      * @return the value of the hand as an integer between 1 and 7462
      */
@@ -59,6 +62,7 @@ public abstract class FiveCardHandEvaluator {
 
     /**
      * Checks if the given array of values has any duplicates.
+     *
      * @param values the values to check
      * @return true if the values contain duplicates, false otherwise
      */

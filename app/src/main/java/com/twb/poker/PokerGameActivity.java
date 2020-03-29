@@ -103,7 +103,6 @@ public class PokerGameActivity extends AppCompatActivity
         return bd.doubleValue();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -114,6 +113,7 @@ public class PokerGameActivity extends AppCompatActivity
     private void checkThreadLife() {
         if (pokerGameThread != null) {
             if (!pokerGameThread.isAlive()) {
+                toast("Restarting Poker Game Thread");
                 pokerGameThread.start();
             }
         } else {

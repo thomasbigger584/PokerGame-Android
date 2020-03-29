@@ -2,8 +2,6 @@ package com.twb.poker.util;
 
 import android.widget.SeekBar;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 public abstract class SeekBarChangeListenerBase implements SeekBar.OnSeekBarChangeListener {
 
     @Override
@@ -13,12 +11,12 @@ public abstract class SeekBarChangeListenerBase implements SeekBar.OnSeekBarChan
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-        throw new NotImplementedException("onStartTrackingTouch not implemented");
+        //left blank intentionally
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        throw new NotImplementedException("onStopTrackingTouch not implemented");
+        //left blank intentionally
     }
 
     public abstract void onProgressChanged(int progress);

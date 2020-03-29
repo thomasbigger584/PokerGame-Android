@@ -4,9 +4,9 @@ package com.twb.poker.domain;
  * Lookup tables for making calculations faster.
  */
 public class Tables {
+    public static final byte[] PRIMES = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
     private static final int CARDS_IN_DECK = 52;
     private static final int HAND_COMBINATIONS = 2598960;
-    public static final byte[] PRIMES = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
     private static final int[] DECK = {
             98306, 164099, 295429, 557831, 1082379, 2131213, 4228625, 8423187, 16812055, 33589533, 67144223, 134253349,
             268471337, 81922, 147715, 279045, 541447, 1065995, 2114829, 4212241, 8406803, 16795671, 33573149, 67127839,
