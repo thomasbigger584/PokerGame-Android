@@ -16,6 +16,8 @@ import com.twb.poker.util.SleepUtil;
 
 import java.util.List;
 
+import static android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY;
+import static android.os.Process.setThreadPriority;
 import static com.twb.poker.util.SleepUtil.dealSleep;
 import static com.twb.poker.util.SleepUtil.gameDelaySleep;
 import static com.twb.poker.util.SleepUtil.playerTurnSleep;
@@ -44,6 +46,8 @@ public class PokerGameThread extends Thread {
 
     @Override
     public void run() {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY);
+
         while (pokerTable.size() > 1) {
             initGame();
 
