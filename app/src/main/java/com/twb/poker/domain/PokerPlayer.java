@@ -26,6 +26,8 @@ public class PokerPlayer {
 
     private boolean turnPlayer;
 
+    private boolean folded;
+
     public void update(final Card card) {
         cardPairLayout.updateCardImageView(card);
         hand.update(card);
@@ -44,7 +46,13 @@ public class PokerPlayer {
         cardPairLayout.updateTurnPlayer(turnPlayer);
     }
 
+    public void setFolded(boolean folded) {
+        this.folded = folded;
+        cardPairLayout.updateFolded(folded);
+    }
+
     public void reset() {
+        this.folded = false;
         this.hand = new Hand();
         cardPairLayout.reset();
     }

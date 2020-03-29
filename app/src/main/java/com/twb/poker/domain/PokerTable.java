@@ -6,6 +6,7 @@ import com.twb.poker.layout.CommunityCardLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -45,6 +46,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         add(pokerPlayer);
     }
 
+
     public PokerTable reassignPokerTableForDealer() {
         int dealerIndex = getDealerIndex();
 
@@ -83,7 +85,6 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         return NO_DEALER;
     }
 
-    //todo might need revisited / test this actually rotates
     public void rotateDealer() {
         for (int index = 0; index < size(); index++) {
             PokerPlayer player = get(index);
@@ -107,6 +108,9 @@ public class PokerTable extends ArrayList<PokerPlayer> {
 
         //using copy as dont want to sort the existing table.
         List<PokerPlayer> copyPokerTable = new ArrayList<>(this);
+
+        removeFoldedPlayers(copyPokerTable);
+
         for (PokerPlayer pokerPlayer : copyPokerTable) {
             Hand hand = pokerPlayer.getHand();
             hand.setCommunityCards(playableCards);
@@ -138,12 +142,37 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         return handWinners;
     }
 
+    private void removeFoldedPlayers(List<PokerPlayer> copyPokerTable) {
+        final Iterator<PokerPlayer> each = copyPokerTable.iterator();
+        while (each.hasNext()) {
+            if (each.next().isFolded()) {
+                each.remove();
+            }
+        }
+    }
+
     public PokerPlayer getPrevious(int index) {
         if (index == 0) {
             return get(size() - 1);
         } else {
             return get(index - 1);
         }
+    }
+
+    public void foldCurrentPlayer() {
+        PokerPlayer currentPlayer = getCurrentPlayer();
+        if (currentPlayer != null) {
+            currentPlayer.setFolded(true);
+        }
+    }
+
+    private PokerPlayer getCurrentPlayer() {
+        for (PokerPlayer pokerPlayer : this) {
+            if (pokerPlayer.isCurrentPlayer()) {
+                return pokerPlayer;
+            }
+        }
+        return null;
     }
 
     public void reset() {

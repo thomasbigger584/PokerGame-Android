@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment;
 import com.twb.poker.R;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.Hand;
+import com.twb.poker.domain.HandType;
 import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.domain.PokerPlayer;
 
@@ -72,8 +73,10 @@ public class WinnersDialog extends PokerDialog {
         if (pokerPlayerWinnersList.size() == 1) {
             PokerPlayer winningPokerPlayer = pokerPlayerWinnersList.get(0);
             PlayerUser playerUser = winningPokerPlayer.getPlayerUser();
-            return "Winner is " + playerUser.getDisplayName() +
-                    " with : " + winningPokerPlayer.getHand();
+            Hand hand = winningPokerPlayer.getHand();
+            HandType handType = hand.getType();
+            String handTypeStr = handType.getValue();
+            return "Winner is " + playerUser.getDisplayName() + " with a " + handTypeStr;
         } else {
             StringBuilder winnersString = new StringBuilder();
             for (int index = 0; index < pokerPlayerWinnersList.size(); index++) {
@@ -84,7 +87,10 @@ public class WinnersDialog extends PokerDialog {
                     winnersString.append(", ");
                 }
             }
-            return "Split pot: " + winnersString.toString();
+            Hand singleHand = pokerPlayerWinnersList.get(0).getHand();
+            HandType handType = singleHand.getType();
+            String handTypeStr = handType.getValue();
+            return "Split pot " + winnersString.toString() + " with a " + handTypeStr;
         }
     }
 

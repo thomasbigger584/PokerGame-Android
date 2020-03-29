@@ -168,9 +168,15 @@ public class PokerGameThread extends Thread {
             PokerPlayer prevPokerPlayer = pokerTable.getPrevious(index);
             PokerPlayer thisPokerPlayer = pokerTable.get(index);
             prevPokerPlayer.setTurnPlayer(false);
+
+            if (thisPokerPlayer.isFolded()) {
+                continue;
+            }
+
             thisPokerPlayer.setTurnPlayer(true);
 
             if (thisPokerPlayer.isCurrentPlayer()) {
+
                 uiHandler.post(() -> {
                     this.callback.onVibrate();
                     this.callback.onControlsShow();
@@ -219,16 +225,10 @@ public class PokerGameThread extends Thread {
 
     private void finishRound() {
         this.pokerTable.rotateDealer();
-
-        toast("Round finished");
-
         roundDelaySleep();
     }
 
     private void finishGame() {
-
-        toast("Game Finished");
-
         gameDelaySleep();
     }
 
@@ -236,8 +236,13 @@ public class PokerGameThread extends Thread {
         uiHandler.post(() -> callback.toast(message));
     }
 
-    public void setTurnButtonPressed() {
+    void setTurnButtonPressed() {
         this.turnButtonPressed = true;
+    }
+
+    void foldCurrentPlayer() {
+        this.pokerTable.foldCurrentPlayer();
+        setTurnButtonPressed();
     }
 
     @MainThread

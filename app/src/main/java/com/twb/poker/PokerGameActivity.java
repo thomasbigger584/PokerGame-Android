@@ -73,7 +73,7 @@ public class PokerGameActivity extends AppCompatActivity
         });
         Button foldButton = controlsGridLayout.findViewById(R.id.foldButton);
         foldButton.setOnClickListener(v -> {
-            pokerGameThread.setTurnButtonPressed();
+            pokerGameThread.foldCurrentPlayer();
         });
         Button betButton = controlsGridLayout.findViewById(R.id.betButton);
         betButton.setOnClickListener(v -> showBetDialog());
@@ -110,15 +110,17 @@ public class PokerGameActivity extends AppCompatActivity
         checkThreadLife();
     }
 
-    private void checkThreadLife() {
+    private boolean checkThreadLife() {
         if (pokerGameThread != null) {
             if (!pokerGameThread.isAlive()) {
                 toast("Restarting Poker Game Thread");
                 pokerGameThread.start();
             }
+            return false;
         } else {
             createPokerGameThread(pokerTable);
             pokerGameThread.start();
+            return true;
         }
     }
 
@@ -166,14 +168,18 @@ public class PokerGameActivity extends AppCompatActivity
     @Override
     public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, UserInputCallback userInputCallback) {
         dismissPokerDialog();
-        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, userInputCallback::onUserInput);
+        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, () -> {
+            if (!checkThreadLife()) {
+                userInputCallback.onUserInput();
+            }
+        });
         pokerDialog.show(getSupportFragmentManager());
     }
 
     private void showBetDialog() {
         dismissPokerDialog();
         pokerDialog = BetRaiseDialog.newInstance(BET, amount -> {
-
+            toast("Bet: " + amount);
         });
         pokerDialog.show(getSupportFragmentManager());
     }
@@ -181,7 +187,7 @@ public class PokerGameActivity extends AppCompatActivity
     private void showRaiseDialog() {
         dismissPokerDialog();
         pokerDialog = BetRaiseDialog.newInstance(RAISE, amount -> {
-
+            toast("Raise: " + amount);
         });
         pokerDialog.show(getSupportFragmentManager());
     }
@@ -194,12 +200,13 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     private void setFullScreen() {
-        pokerGameLinearLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        pokerGameLinearLayout.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LOW_PROFILE
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
     @Override

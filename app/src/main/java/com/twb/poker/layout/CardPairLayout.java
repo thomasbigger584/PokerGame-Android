@@ -98,4 +98,12 @@ public class CardPairLayout extends FrameLayout {
         });
     }
 
+    public void updateFolded(boolean folded) {
+        post(() -> {
+            int visibility = (folded) ? INVISIBLE : VISIBLE;
+            for (ImageView cardImageView : cardImageViews) {
+                cardImageView.setVisibility(visibility);
+            }
+        });
+    }
 }
