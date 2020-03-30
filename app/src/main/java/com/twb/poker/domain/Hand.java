@@ -142,7 +142,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
 
         List<Card> copyHand = new ArrayList<>(this);
         Collections.sort(copyHand, (o1, o2) ->
-                Integer.compare(o2.getRank(), o1.getRank()));
+                Integer.compare(o1.getRank(), o2.getRank()));
         int count = 0;
         Integer current = null;
         for (Card card : copyHand) {
