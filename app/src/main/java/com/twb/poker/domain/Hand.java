@@ -7,6 +7,7 @@ import com.twb.poker.eval.SevenCardHandEvaluator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,8 @@ import lombok.Getter;
 @Getter
 @SuppressLint("UseSparseArrays")
 public class Hand extends ArrayList<Card> implements Comparable<Hand> {
+    private static final List<Integer> PARTIAL_LOWER_STRAIGHT =
+            Arrays.asList(Card.DEUCE, Card.TREY, Card.FOUR, Card.FIVE);
     private Integer rank;
 
     public Hand() {
@@ -135,7 +138,6 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         return false;
     }
 
-    //todo ace is -1 (before 0) or 12
     private boolean isStraight() {
         if (checkCardNullability()) return false;
         if (checkHandSize(5)) return false;
@@ -143,19 +145,27 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         List<Card> copyHand = new ArrayList<>(this);
         Collections.sort(copyHand, (o1, o2) ->
                 Integer.compare(o1.getRank(), o2.getRank()));
-        int count = 0;
-        Integer current = null;
+
+        boolean reachedPartLowStraight = false;
+        List<Integer> currentStraights = null;
         for (Card card : copyHand) {
-            int rank = card.getRank();
-            if (current != null && current + 1 == rank) {
-                current = rank;
-                count++;
-                if (count == 5) {
+            final int rank = card.getRank();
+            int straightSize = (currentStraights != null) ? currentStraights.size() : 0;
+            if (!reachedPartLowStraight) {
+                reachedPartLowStraight = (currentStraights != null) &&
+                        currentStraights.containsAll(PARTIAL_LOWER_STRAIGHT);
+            } else if (rank == Card.ACE) {
+                return true;
+            }
+            if (currentStraights != null && currentStraights.get(straightSize - 1) + 1 == rank) {
+                currentStraights.add(rank);
+                straightSize = currentStraights.size();
+                if (straightSize == 5) {
                     return true;
                 }
             } else {
-                current = rank;
-                count = 1;
+                currentStraights = new ArrayList<>();
+                currentStraights.add(rank);
             }
         }
         return false;
