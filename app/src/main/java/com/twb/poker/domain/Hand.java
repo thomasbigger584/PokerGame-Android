@@ -162,28 +162,54 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
                 Integer.compare(o1.getRank(), o2.getRank()));
 
         boolean reachedPartLowStraight = false;
-        List<Integer> currentStraights = null;
+        List<Card> currentStraight = null;
         for (Card card : copyHand) {
             final int rank = card.getRank();
-            int straightSize = (currentStraights != null) ? currentStraights.size() : 0;
+            int straightSize = getCurrentStraightSize(currentStraight);
             if (!reachedPartLowStraight) {
-                reachedPartLowStraight = (currentStraights != null) &&
-                        currentStraights.containsAll(PARTIAL_LOWER_STRAIGHT);
+                reachedPartLowStraight = containsAllPartialForStraight(currentStraight);
             } else if (rank == Card.ACE) {
                 return true;
             }
-            if (currentStraights != null && currentStraights.get(straightSize - 1) + 1 == rank) {
-                currentStraights.add(rank);
-                straightSize = currentStraights.size();
+            if (isLastElementBeforeCurrentRank(currentStraight, rank)) {
+                currentStraight.add(card);
+                straightSize = currentStraight.size();
                 if (straightSize == 5) {
                     return true;
                 }
             } else {
-                currentStraights = new ArrayList<>();
-                currentStraights.add(rank);
+                currentStraight = new ArrayList<>();
+                currentStraight.add(card);
             }
         }
         return false;
+    }
+
+    private boolean isLastElementBeforeCurrentRank(List<Card> currentStraight, int rank) {
+        if (currentStraight == null || currentStraight.isEmpty()) {
+            return false;
+        }
+        int size = currentStraight.size();
+        Card card = currentStraight.get(size - 1);
+        return (card.getRank() + 1 == rank);
+    }
+
+    private int getCurrentStraightSize(List<Card> currentStraight) {
+        if (currentStraight == null) {
+            return 0;
+        }
+        return currentStraight.size();
+    }
+
+    private boolean containsAllPartialForStraight(List<Card> currentStraight) {
+        if (currentStraight == null) {
+            return false;
+        }
+        List<Integer> cardRanks = new ArrayList<>();
+        for (Card card : currentStraight) {
+            cardRanks.add(card.getRank());
+        }
+        return cardRanks.containsAll(PARTIAL_LOWER_STRAIGHT);
     }
 
     private boolean isThreeOfAKind() {
