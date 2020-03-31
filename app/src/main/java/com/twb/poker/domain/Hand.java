@@ -21,16 +21,21 @@ import lombok.Getter;
 public class Hand extends ArrayList<Card> implements Comparable<Hand> {
     private static final List<Integer> PARTIAL_LOWER_STRAIGHT =
             Arrays.asList(Card.DEUCE, Card.TREY, Card.FOUR, Card.FIVE);
+    private static final int SEVEN_CARDS_NEEDED = 7;
+    private static final int FIVE_CARDS_NEEDED = 5;
+    private static final int FOUR_CARDS_NEEDED = 4;
+    private static final int THREE_CARDS_NEEDED = 3;
+    private static final int TWO_CARDS_NEEDED = 2;
     private Integer rank;
 
     public Hand() {
-        for (int index = 0; index < 2; index++) {
+        for (int index = 0; index < TWO_CARDS_NEEDED; index++) {
             add(null);
         }
     }
 
     public void setCommunityCards(List<Card> playableCards) {
-        if (size() != 7) {
+        if (size() != SEVEN_CARDS_NEEDED) {
             addAll(new ArrayList<>(playableCards));
         }
     }
@@ -76,7 +81,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
 
     private boolean isRoyalFlush() {
         if (checkCardNullability()) return false;
-        if (checkHandSize(5)) return false;
+        if (checkHandSize(FIVE_CARDS_NEEDED)) return false;
 
 
         return false;
@@ -84,7 +89,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
 
     private boolean isStraightFlush() {
         if (checkCardNullability()) return false;
-        if (checkHandSize(5)) return false;
+        if (checkHandSize(FIVE_CARDS_NEEDED)) return false;
 
 //        List<Card> copyHand = new ArrayList<>(this);
 //        Collections.sort(copyHand, (o1, o2) ->
@@ -113,12 +118,12 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
     }
 
     private boolean isFourOfAKind() {
-        return isOfAKind(4);
+        return isOfAKind(FOUR_CARDS_NEEDED);
     }
 
     private boolean isFullHouse() {
         if (checkCardNullability()) return false;
-        if (checkHandSize(5)) return false;
+        if (checkHandSize(FIVE_CARDS_NEEDED)) return false;
 
         Map<Integer, Integer> rankToCountMap = getRankCount();
 
@@ -126,9 +131,9 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         int threesCount = 0;
         for (Map.Entry<Integer, Integer> entry : rankToCountMap.entrySet()) {
             Integer suitCount = entry.getValue();
-            if (suitCount == 2) {
+            if (suitCount == TWO_CARDS_NEEDED) {
                 twosCount++;
-            } else if (suitCount == 3) {
+            } else if (suitCount == THREE_CARDS_NEEDED) {
                 threesCount++;
             }
         }
@@ -137,11 +142,11 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
 
     private boolean isFlush() {
         if (checkCardNullability()) return false;
-        if (checkHandSize(5)) return false;
+        if (checkHandSize(FIVE_CARDS_NEEDED)) return false;
 
         Map<Integer, Integer> suitToCountMap = getSuitCount();
         for (Map.Entry<Integer, Integer> suitToCount : suitToCountMap.entrySet()) {
-            if (suitToCount.getValue() == 5) {
+            if (suitToCount.getValue() == FIVE_CARDS_NEEDED) {
                 return true;
             }
         }
@@ -150,7 +155,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
 
     private boolean isStraight() {
         if (checkCardNullability()) return false;
-        if (checkHandSize(5)) return false;
+        if (checkHandSize(FIVE_CARDS_NEEDED)) return false;
 
         List<Card> copyHand = new ArrayList<>(this);
         Collections.sort(copyHand, (o1, o2) ->
@@ -182,12 +187,12 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
     }
 
     private boolean isThreeOfAKind() {
-        return isOfAKind(3);
+        return isOfAKind(THREE_CARDS_NEEDED);
     }
 
     private boolean isTwoPair() {
         if (checkCardNullability()) return false;
-        if (checkHandSize(4)) return false;
+        if (checkHandSize(FOUR_CARDS_NEEDED)) return false;
 
         Map<Integer, Integer> rankToCountMap = getRankCount();
 
@@ -235,7 +240,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
     }
 
     private boolean isPair() {
-        return isOfAKind(2);
+        return isOfAKind(TWO_CARDS_NEEDED);
     }
 
     private boolean isOfAKind(int kindness) {
