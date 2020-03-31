@@ -165,7 +165,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         List<Card> currentStraight = null;
         for (Card card : copyHand) {
             final int rank = card.getRank();
-            int straightSize = getCurrentStraightSize(currentStraight);
+
             if (!reachedPartLowStraight) {
                 reachedPartLowStraight = containsAllPartialForStraight(currentStraight);
             } else if (rank == Card.ACE) {
@@ -173,8 +173,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
             }
             if (isLastElementBeforeCurrentRank(currentStraight, rank)) {
                 currentStraight.add(card);
-                straightSize = currentStraight.size();
-                if (straightSize == 5) {
+                if (currentStraight.size() == 5) {
                     return true;
                 }
             } else {
@@ -192,13 +191,6 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         int size = currentStraight.size();
         Card card = currentStraight.get(size - 1);
         return (card.getRank() + 1 == rank);
-    }
-
-    private int getCurrentStraightSize(List<Card> currentStraight) {
-        if (currentStraight == null) {
-            return 0;
-        }
-        return currentStraight.size();
     }
 
     private boolean containsAllPartialForStraight(List<Card> currentStraight) {
