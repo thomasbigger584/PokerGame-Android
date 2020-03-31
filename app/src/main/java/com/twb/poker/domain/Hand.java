@@ -82,10 +82,32 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         return false;
     }
 
-    //todo ace is -1 (before 0) or 12
     private boolean isStraightFlush() {
         if (checkCardNullability()) return false;
         if (checkHandSize(5)) return false;
+
+//        List<Card> copyHand = new ArrayList<>(this);
+//        Collections.sort(copyHand, (o1, o2) ->
+//                Integer.compare(o1.getRank(), o2.getRank()));
+//
+//        //pair rank to suit
+//        List<Card> currentStraights = null;
+//        for (Card card : copyHand) {
+//            final int rank = card.getRank();
+//            final int suit = card.getSuit();
+//
+//            int straightSize = (currentStraights != null) ? currentStraights.size() : 0;
+//            if (currentStraights != null && currentStraights.get(straightSize - 1).getRank() + 1 == rank) {
+//                currentStraights.add(card);
+//                straightSize = currentStraights.size();
+//                if (straightSize == 5) {
+//                    return true;
+//                }
+//            } else {
+//                currentStraights = new ArrayList<>();
+//                currentStraights.add(card);
+//            }
+//        }
 
         return false;
     }
@@ -117,22 +139,10 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         if (checkCardNullability()) return false;
         if (checkHandSize(5)) return false;
 
-        List<Card> copyHand = new ArrayList<>(this);
-        Collections.sort(copyHand, (o1, o2) ->
-                Integer.compare(o2.getSuit(), o1.getSuit()));
-        int count = 0;
-        Integer current = null;
-        for (Card card : copyHand) {
-            int suit = card.getSuit();
-            if (current != null && current == suit) {
-                current = suit;
-                count++;
-                if (count == 5) {
-                    return true;
-                }
-            } else {
-                current = suit;
-                count = 1;
+        Map<Integer, Integer> suitToCountMap = getSuitCount();
+        for (Map.Entry<Integer, Integer> suitToCount : suitToCountMap.entrySet()) {
+            if (suitToCount.getValue() == 5) {
+                return true;
             }
         }
         return false;
@@ -195,9 +205,24 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
     }
 
     @NotNull
+    private Map<Integer, Integer> getSuitCount() {
+        Map<Integer, Integer> suitToCountMap = new HashMap<>();
+        for (Card card : this) {
+            int suit = card.getSuit();
+            Integer count = suitToCountMap.get(suit);
+            if (count == null) {
+                suitToCountMap.put(suit, 1);
+            } else {
+                suitToCountMap.put(suit, ++count);
+            }
+        }
+        return suitToCountMap;
+    }
+
+    @NotNull
     private Map<Integer, Integer> getRankCount() {
         Map<Integer, Integer> rankToCountMap = new HashMap<>();
-        for (Card card : Hand.this) {
+        for (Card card : this) {
             int rank = card.getRank();
             Integer count = rankToCountMap.get(rank);
             if (count == null) {

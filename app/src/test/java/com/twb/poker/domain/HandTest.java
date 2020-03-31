@@ -26,7 +26,7 @@ public class HandTest {
         assertEquals(ROYAL_FLUSH, handType);
     }
 
-    //    @Test
+    @Test
     public void testStraightFlushMiddle() {
         Hand hand = createStraightFlushMiddle();
         HandType handType = hand.getType();
