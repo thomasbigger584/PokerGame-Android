@@ -2,7 +2,6 @@ package com.twb.poker;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.MainThread;
 
@@ -36,6 +35,7 @@ public class PokerGameThread extends Thread {
     private PokerGameThreadCallback callback;
     private boolean turnButtonPressed = false;
     private boolean evalWaitingOnUserInput = false;
+
 
     PokerGameThread(PokerTable pokerTable, PokerGameThreadCallback callback) {
         setName(PokerGameThread.class.getSimpleName());
@@ -201,7 +201,7 @@ public class PokerGameThread extends Thread {
                     }
 
                     if (turnSecondsLeft - SleepUtil.PLAYER_RESPONSE_LOOP_IN_SECONDS <= 0) {
-                        Log.e(TAG, "Force Fold");
+                        thisPokerPlayer.setFolded(true);
                         uiHandler.post(() -> {
                             callback.onControlsHide();
                         });
