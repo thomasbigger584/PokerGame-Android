@@ -107,26 +107,17 @@ public class PokerGameActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         setFullScreen();
-        checkThreadLife();
+        startGameThread();
     }
 
-    private boolean checkThreadLife() {
-        if (pokerGameThread != null) {
-            if (!pokerGameThread.isAlive()) {
-                toast("Restarting Poker Game Thread");
-                pokerGameThread.start();
-            }
-            return false;
-        } else {
-            createPokerGameThread(pokerTable);
-            pokerGameThread.start();
-            return true;
+    private void startGameThread() {
+        if (pokerGameThread == null) {
+            pokerGameThread = new PokerGameThread(pokerTable, this);
+            pokerGameThread.setUncaughtExceptionHandler(this);
         }
-    }
-
-    private void createPokerGameThread(PokerTable pokerTable) {
-        pokerGameThread = new PokerGameThread(pokerTable, this);
-        pokerGameThread.setUncaughtExceptionHandler(this);
+        if (!pokerGameThread.isAlive()) {
+            pokerGameThread.start();
+        }
     }
 
     @Override
@@ -168,11 +159,7 @@ public class PokerGameActivity extends AppCompatActivity
     @Override
     public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, UserInputCallback userInputCallback) {
         dismissPokerDialog();
-        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, () -> {
-            if (!checkThreadLife()) {
-                userInputCallback.onUserInput();
-            }
-        });
+        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, userInputCallback::onUserInput);
         pokerDialog.show(getSupportFragmentManager());
     }
 

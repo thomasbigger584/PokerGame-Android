@@ -24,8 +24,12 @@ public class SleepUtil {
     }
 
     private static void sleep(double sleep) {
+        sleep(Math.round(sleep / MULTIPLIER));
+    }
+
+    public static void sleep(long sleep) {
         try {
-            Thread.sleep(Math.round(sleep / MULTIPLIER));
+            Thread.sleep(sleep);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

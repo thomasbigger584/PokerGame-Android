@@ -156,11 +156,13 @@ public class PokerGameThread extends Thread {
     private void eval() {
         List<PokerPlayer> pokerPlayerWinners =
                 pokerTable.evaluateAndGetWinners();
-        callback.onWinnerDialogShow(pokerPlayerWinners,
-                () -> this.evalWaitingOnUserInput = false);
+        callback.onWinnerDialogShow(pokerPlayerWinners, () -> {
+            evalWaitingOnUserInput = false;
+        });
         this.evalWaitingOnUserInput = true;
-        //noinspection StatementWithEmptyBody
-        while (this.evalWaitingOnUserInput) ;
+        while (this.evalWaitingOnUserInput) {
+            SleepUtil.sleep(10);
+        }
     }
 
     private void performPlayerBetTurn() {
