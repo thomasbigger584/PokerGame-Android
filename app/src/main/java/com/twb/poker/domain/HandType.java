@@ -17,7 +17,8 @@ public enum HandType {
     THREE_OF_A_KIND("Three of a Kind"),
     TWO_PAIR("Two Pair"),
     PAIR("Pair"),
-    HIGH_CARD("High Card");
+    HIGH_CARD("High Card"),
+    EMPTY_HAND("Empty Hand");
 
     private final String value;
 }

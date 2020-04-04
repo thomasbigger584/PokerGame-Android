@@ -30,6 +30,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
     private static final int FOUR_CARDS_NEEDED = 4;
     private static final int THREE_CARDS_NEEDED = 3;
     private static final int TWO_CARDS_NEEDED = 2;
+    private static final int ONE_CARD_NEEDED = 1;
     private Integer rank;
 
     public Hand() {
@@ -83,8 +84,10 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
             return HandType.TWO_PAIR;
         } else if (isPair()) {
             return HandType.PAIR;
+        } else if (checkHandSize(ONE_CARD_NEEDED)) {
+            return HandType.HIGH_CARD;
         }
-        return HandType.HIGH_CARD;
+        return HandType.EMPTY_HAND;
     }
 
     private boolean isRoyalFlush() {
