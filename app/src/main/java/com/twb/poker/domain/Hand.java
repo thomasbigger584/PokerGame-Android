@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import com.twb.poker.eval.SevenCardHandEvaluator;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,9 @@ import lombok.Getter;
 public class Hand extends ArrayList<Card> implements Comparable<Hand> {
     private static final List<Integer> PARTIAL_LOWER_STRAIGHT =
             Arrays.asList(Card.DEUCE, Card.TREY, Card.FOUR, Card.FIVE);
+    private static final List<Integer> ROYAL_FLUSH_RANKS =
+            Arrays.asList(Card.TEN, Card.JACK, Card.QUEEN, Card.KING, Card.ACE);
+
     private static final int SEVEN_CARDS_NEEDED = 7;
     private static final int FIVE_CARDS_NEEDED = 5;
     private static final int FOUR_CARDS_NEEDED = 4;
@@ -32,6 +36,10 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         for (int index = 0; index < TWO_CARDS_NEEDED; index++) {
             add(null);
         }
+    }
+
+    private Hand(List<Card> hand) {
+        super(hand);
     }
 
     public void setCommunityCards(List<Card> playableCards) {
@@ -83,7 +91,20 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         if (checkCardNullability()) return false;
         if (checkHandSize(FIVE_CARDS_NEEDED)) return false;
 
-
+        Map<Integer, Integer> suitCount = getSuitCount();
+        for (Map.Entry<Integer, Integer> thisSuitCount : suitCount.entrySet()) {
+            List<Card> flushCards = getFlushCards(thisSuitCount);
+            if (flushCards == null) {
+                continue;
+            }
+            List<Integer> flushedRanks = new ArrayList<>();
+            for (Card suitCard : flushCards) {
+                flushedRanks.add(suitCard.getRank());
+            }
+            if (flushedRanks.containsAll(ROYAL_FLUSH_RANKS)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -91,29 +112,17 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
         if (checkCardNullability()) return false;
         if (checkHandSize(FIVE_CARDS_NEEDED)) return false;
 
-//        List<Card> copyHand = new ArrayList<>(this);
-//        Collections.sort(copyHand, (o1, o2) ->
-//                Integer.compare(o1.getRank(), o2.getRank()));
-//
-//        //pair rank to suit
-//        List<Card> currentStraights = null;
-//        for (Card card : copyHand) {
-//            final int rank = card.getRank();
-//            final int suit = card.getSuit();
-//
-//            int straightSize = (currentStraights != null) ? currentStraights.size() : 0;
-//            if (currentStraights != null && currentStraights.get(straightSize - 1).getRank() + 1 == rank) {
-//                currentStraights.add(card);
-//                straightSize = currentStraights.size();
-//                if (straightSize == 5) {
-//                    return true;
-//                }
-//            } else {
-//                currentStraights = new ArrayList<>();
-//                currentStraights.add(card);
-//            }
-//        }
-
+        Map<Integer, Integer> suitCount = getSuitCount();
+        for (Map.Entry<Integer, Integer> thisSuitCount : suitCount.entrySet()) {
+            List<Card> flushCards = getFlushCards(thisSuitCount);
+            if (flushCards == null) {
+                continue;
+            }
+            Hand potentialStraightFlush = new Hand(flushCards);
+            if (potentialStraightFlush.isStraight()) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -154,54 +163,43 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
     }
 
     private boolean isStraight() {
-        if (checkCardNullability()) return false;
-        if (checkHandSize(FIVE_CARDS_NEEDED)) return false;
+        return isStraightHand() != null;
+    }
+
+    private Hand isStraightHand() {
+        if (checkCardNullability()) return null;
+        if (checkHandSize(FIVE_CARDS_NEEDED)) return null;
 
         List<Card> copyHand = new ArrayList<>(this);
-        Collections.sort(copyHand, (o1, o2) ->
-                Integer.compare(o1.getRank(), o2.getRank()));
+        Collections.sort(copyHand, (o1, o2) -> {
+            int rankComp = Integer.compare(o1.getRank(), o2.getRank());
+            if (rankComp != 0) {
+                return rankComp;
+            }
+            return Integer.compare(o1.getSuit(), o2.getSuit());
+        });
 
         boolean reachedPartLowStraight = false;
         List<Card> currentStraight = null;
         for (Card card : copyHand) {
             final int rank = card.getRank();
-
             if (!reachedPartLowStraight) {
                 reachedPartLowStraight = containsAllPartialForStraight(currentStraight);
             } else if (rank == Card.ACE) {
-                return true;
+                currentStraight.add(card);
+                return new Hand(currentStraight);
             }
             if (isLastElementBeforeCurrentRank(currentStraight, rank)) {
                 currentStraight.add(card);
                 if (currentStraight.size() == 5) {
-                    return true;
+                    return new Hand(currentStraight);
                 }
             } else {
                 currentStraight = new ArrayList<>();
                 currentStraight.add(card);
             }
         }
-        return false;
-    }
-
-    private boolean isLastElementBeforeCurrentRank(List<Card> currentStraight, int rank) {
-        if (currentStraight == null || currentStraight.isEmpty()) {
-            return false;
-        }
-        int size = currentStraight.size();
-        Card card = currentStraight.get(size - 1);
-        return (card.getRank() + 1 == rank);
-    }
-
-    private boolean containsAllPartialForStraight(List<Card> currentStraight) {
-        if (currentStraight == null) {
-            return false;
-        }
-        List<Integer> cardRanks = new ArrayList<>();
-        for (Card card : currentStraight) {
-            cardRanks.add(card.getRank());
-        }
-        return cardRanks.containsAll(PARTIAL_LOWER_STRAIGHT);
+        return null;
     }
 
     private boolean isThreeOfAKind() {
@@ -280,6 +278,42 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
             }
         }
         return false;
+    }
+
+    @Nullable
+    private List<Card> getFlushCards(Map.Entry<Integer, Integer> thisSuitCount) {
+        final int suit = thisSuitCount.getKey();
+        final int count = thisSuitCount.getValue();
+        if (count < FIVE_CARDS_NEEDED) {
+            return null;
+        }
+        List<Card> potentialStraightCards = new ArrayList<>();
+        for (Card thisCard : this) {
+            if (thisCard.getSuit() == suit) {
+                potentialStraightCards.add(thisCard);
+            }
+        }
+        return potentialStraightCards;
+    }
+
+    private boolean isLastElementBeforeCurrentRank(List<Card> currentStraight, int rank) {
+        if (currentStraight == null || currentStraight.isEmpty()) {
+            return false;
+        }
+        int size = currentStraight.size();
+        Card card = currentStraight.get(size - 1);
+        return (card.getRank() + 1 == rank);
+    }
+
+    private boolean containsAllPartialForStraight(List<Card> currentStraight) {
+        if (currentStraight == null || currentStraight.isEmpty()) {
+            return false;
+        }
+        List<Integer> cardRanks = new ArrayList<>();
+        for (Card card : currentStraight) {
+            cardRanks.add(card.getRank());
+        }
+        return cardRanks.containsAll(PARTIAL_LOWER_STRAIGHT);
     }
 
     private boolean checkHandSize(int expectedSize) {

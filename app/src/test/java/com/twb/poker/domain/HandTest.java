@@ -19,7 +19,7 @@ import static com.twb.poker.domain.HandType.TWO_PAIR;
 import static org.junit.Assert.assertEquals;
 
 public class HandTest {
-    //    @Test
+    @Test
     public void testRoyalFlush() {
         Hand hand = createRoyalFlush();
         HandType handType = hand.getType();
@@ -33,17 +33,15 @@ public class HandTest {
         assertEquals(STRAIGHT_FLUSH, handType);
     }
 
-    //    @Test
+    @Test
     public void testStraightFlushAceLower() {
-        //TODO: ace as lower straight
         Hand hand = createStraightFlushMiddle();
         HandType handType = hand.getType();
         assertEquals(STRAIGHT_FLUSH, handType);
     }
 
-    //    @Test
+    @Test
     public void testStraightFlushAceHigher() {
-        //TODO: ace as higher straight
         Hand hand = createStraightFlushMiddle();
         HandType handType = hand.getType();
         assertEquals(STRAIGHT_FLUSH, handType);
@@ -73,6 +71,13 @@ public class HandTest {
     @Test
     public void testStraightMiddle() {
         Hand hand = createStraightMiddle();
+        HandType handType = hand.getType();
+        assertEquals(STRAIGHT, handType);
+    }
+
+    @Test
+    public void testStraightWithDuplicates() {
+        Hand hand = createStraightDuplicate();
         HandType handType = hand.getType();
         assertEquals(STRAIGHT, handType);
     }
@@ -195,6 +200,20 @@ public class HandTest {
         cardList.add(new Card(Card.JACK, Card.DIAMONDS, 0));
         return createHand(cardList);
     }
+
+
+    private Hand createStraightDuplicate() {
+        List<Card> cardList = new ArrayList<>();
+        cardList.add(new Card(Card.TEN, Card.CLUBS, 0));
+        cardList.add(new Card(Card.FIVE, Card.DIAMONDS, 0));
+        cardList.add(new Card(Card.SIX, Card.HEARTS, 0));
+        cardList.add(new Card(Card.SEVEN, Card.HEARTS, 0));
+        cardList.add(new Card(Card.EIGHT, Card.SPADES, 0));
+        cardList.add(new Card(Card.SIX, Card.SPADES, 0));
+        cardList.add(new Card(Card.NINE, Card.DIAMONDS, 0));
+        return createHand(cardList);
+    }
+
 
     private Hand createStraightAceLower() {
         List<Card> cardList = new ArrayList<>();
