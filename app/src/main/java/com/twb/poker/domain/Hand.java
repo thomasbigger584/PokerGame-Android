@@ -84,7 +84,7 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
             return HandType.TWO_PAIR;
         } else if (isPair()) {
             return HandType.PAIR;
-        } else if (checkHandSize(ONE_CARD_NEEDED)) {
+        } else if (size() >= ONE_CARD_NEEDED) {
             return HandType.HIGH_CARD;
         }
         return HandType.EMPTY_HAND;
@@ -192,14 +192,16 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
                 currentStraight.add(card);
                 return new Hand(currentStraight);
             }
-            if (isLastElementBeforeCurrentRank(currentStraight, rank)) {
-                currentStraight.add(card);
-                if (currentStraight.size() == 5) {
-                    return new Hand(currentStraight);
+            if (!isRankInCurrentStraight(currentStraight, rank)) {
+                if (isLastElementBeforeCurrentRank(currentStraight, rank)) {
+                    currentStraight.add(card);
+                    if (currentStraight.size() == 5) {
+                        return new Hand(currentStraight);
+                    }
+                } else {
+                    currentStraight = new ArrayList<>();
+                    currentStraight.add(card);
                 }
-            } else {
-                currentStraight = new ArrayList<>();
-                currentStraight.add(card);
             }
         }
         return null;
@@ -321,6 +323,18 @@ public class Hand extends ArrayList<Card> implements Comparable<Hand> {
 
     private boolean checkHandSize(int expectedSize) {
         return size() < expectedSize;
+    }
+
+    private boolean isRankInCurrentStraight(List<Card> currentStraight, int rank) {
+        if (currentStraight == null || currentStraight.isEmpty()) {
+            return false;
+        }
+        for (Card card : currentStraight) {
+            if (card.getRank() == rank) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean checkCardNullability() {

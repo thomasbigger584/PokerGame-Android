@@ -75,6 +75,15 @@ public class HandTest {
         assertEquals(STRAIGHT, handType);
     }
 
+
+    @Test
+    //found through testing
+    public void testStraight() {
+        Hand hand = createStraight();
+        HandType handType = hand.getType();
+        assertEquals(STRAIGHT, handType);
+    }
+
     @Test
     public void testStraightWithDuplicates() {
         Hand hand = createStraightDuplicate();
@@ -201,6 +210,17 @@ public class HandTest {
         return createHand(cardList);
     }
 
+    private Hand createStraight() {
+        List<Card> cardList = new ArrayList<>();
+        cardList.add(new Card(Card.TREY, Card.HEARTS, 0));
+        cardList.add(new Card(Card.FIVE, Card.CLUBS, 0));
+        cardList.add(new Card(Card.SIX, Card.HEARTS, 0));
+        cardList.add(new Card(Card.SEVEN, Card.CLUBS, 0));
+        cardList.add(new Card(Card.SEVEN, Card.SPADES, 0));
+        cardList.add(new Card(Card.EIGHT, Card.SPADES, 0));
+        cardList.add(new Card(Card.NINE, Card.DIAMONDS, 0));
+        return createHand(cardList);
+    }
 
     private Hand createStraightDuplicate() {
         List<Card> cardList = new ArrayList<>();
