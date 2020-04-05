@@ -9,6 +9,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,6 +41,7 @@ public class PokerGameActivity extends AppCompatActivity
     private GridLayout controlsGridLayout;
     private PokerDialog pokerDialog;
     private PokerTable pokerTable;
+    private ProgressBar secondsLeftProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,21 +69,23 @@ public class PokerGameActivity extends AppCompatActivity
         final CommunityCardLayout communityCardLayout = findViewById(R.id.communityCardLayout);
 
         controlsGridLayout = findViewById(R.id.controlsGridLayout);
-        Button checkButton = controlsGridLayout.findViewById(R.id.checkButton);
+        final Button checkButton = controlsGridLayout.findViewById(R.id.checkButton);
         checkButton.setOnClickListener(v -> {
             pokerGameThread.setTurnButtonPressed();
         });
-        Button foldButton = controlsGridLayout.findViewById(R.id.foldButton);
+        final Button foldButton = controlsGridLayout.findViewById(R.id.foldButton);
         foldButton.setOnClickListener(v -> {
             pokerGameThread.foldCurrentPlayer();
         });
-        Button betButton = controlsGridLayout.findViewById(R.id.betButton);
+        final Button betButton = controlsGridLayout.findViewById(R.id.betButton);
         betButton.setOnClickListener(v -> showBetDialog());
 
-        Button raiseButton = controlsGridLayout.findViewById(R.id.raiseButton);
+        final Button raiseButton = controlsGridLayout.findViewById(R.id.raiseButton);
         raiseButton.setOnClickListener(v -> {
             showRaiseDialog();
         });
+
+        secondsLeftProgressBar = pokerGameLinearLayout.findViewById(R.id.secondsLeftProgressBar);
 
         pokerTable = new PokerTable(communityCardLayout);
         pokerTable.addPlayer(playerCardPairLayout, "Thomas", generateRandomFunds(100, 300), true);
@@ -126,13 +130,14 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSecondsLeft(int secondsLeft) {
-//        Log.e(PokerGameActivity.class.getName(), "onSecondsLeft: " + secondsLeft);
+    public void onPercentageTimeLeft(int percentage) {
+        secondsLeftProgressBar.setProgress(percentage);
     }
 
     @Override
     public void onControlsShow() {
         controlsGridLayout.setVisibility(View.VISIBLE);
+        secondsLeftProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -140,6 +145,9 @@ public class PokerGameActivity extends AppCompatActivity
         dismissPokerDialog();
         if (controlsGridLayout.getVisibility() != View.GONE) {
             controlsGridLayout.setVisibility(View.GONE);
+        }
+        if (secondsLeftProgressBar.getVisibility() != View.INVISIBLE) {
+            secondsLeftProgressBar.setVisibility(View.INVISIBLE);
         }
     }
 

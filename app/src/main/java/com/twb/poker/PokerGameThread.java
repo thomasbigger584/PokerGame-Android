@@ -170,15 +170,12 @@ public class PokerGameThread extends Thread {
             PokerPlayer prevPokerPlayer = pokerTable.getPrevious(index);
             PokerPlayer thisPokerPlayer = pokerTable.get(index);
             prevPokerPlayer.setTurnPlayer(false);
-
             if (thisPokerPlayer.isFolded()) {
                 continue;
             }
-
             thisPokerPlayer.setTurnPlayer(true);
 
             if (thisPokerPlayer.isCurrentPlayer()) {
-
                 uiHandler.post(() -> {
                     this.callback.onVibrate();
                     this.callback.onControlsShow();
@@ -189,9 +186,9 @@ public class PokerGameThread extends Thread {
                 for (double turnSecondsLeft = PLAYER_RESPONSE_TIME_IN_SECONDS; turnSecondsLeft >= 0;
                      turnSecondsLeft = turnSecondsLeft - SleepUtil.PLAYER_RESPONSE_LOOP_IN_SECONDS) {
 
-                    final int secondsleft = (int) turnSecondsLeft;
+                    int percentage = calculatePercentage(turnSecondsLeft);
                     uiHandler.post(() -> {
-                        callback.onSecondsLeft(secondsleft);
+                        callback.onPercentageTimeLeft(percentage);
                     });
                     if (turnButtonPressed) {
                         uiHandler.post(() -> {
@@ -216,6 +213,10 @@ public class PokerGameThread extends Thread {
             }
         }
         pokerTable.get(pokerTable.size() - 1).setTurnPlayer(false);
+    }
+
+    private int calculatePercentage(double secondsLeft) {
+        return (int) Math.round(secondsLeft * 100 / PLAYER_RESPONSE_TIME_IN_SECONDS);
     }
 
     private void dealCommunityCard(CommunityCardType cardType) {
@@ -251,7 +252,7 @@ public class PokerGameThread extends Thread {
     public interface PokerGameThreadCallback {
         void toast(String message);
 
-        void onSecondsLeft(int secondsLeft);
+        void onPercentageTimeLeft(int percentage);
 
         void onControlsShow();
 
