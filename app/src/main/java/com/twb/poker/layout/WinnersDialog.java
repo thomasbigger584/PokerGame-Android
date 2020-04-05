@@ -76,7 +76,7 @@ public class WinnersDialog extends PokerDialog {
             Hand hand = winningPokerPlayer.getHand();
             HandType handType = hand.getType();
             String handTypeStr = handType.getValue();
-            return "Winner is " + playerUser.getDisplayName() + " with a " + handTypeStr;
+            return playerUser.getDisplayName() + " wins with a " + handTypeStr;
         } else {
             StringBuilder winnersString = new StringBuilder();
             for (int index = 0; index < pokerPlayerWinnersList.size(); index++) {
@@ -90,7 +90,7 @@ public class WinnersDialog extends PokerDialog {
             Hand singleHand = pokerPlayerWinnersList.get(0).getHand();
             HandType handType = singleHand.getType();
             String handTypeStr = handType.getValue();
-            return "Split pot " + winnersString.toString() + " with a " + handTypeStr;
+            return winnersString.toString() + " split the pot with " + handTypeStr;
         }
     }
 

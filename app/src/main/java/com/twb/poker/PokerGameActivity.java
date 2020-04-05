@@ -165,9 +165,11 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     @Override
-    public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, UserInputCallback userInputCallback) {
+    public void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners) {
         dismissPokerDialog();
-        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, userInputCallback::onUserInput);
+        pokerDialog = WinnersDialog.newInstance(pokerPlayerWinners, () -> {
+            pokerGameThread.setEvalWaitingOnUserInput();
+        });
         pokerDialog.show(getSupportFragmentManager());
     }
 

@@ -156,9 +156,7 @@ public class PokerGameThread extends Thread {
     private void eval() {
         List<PokerPlayer> pokerPlayerWinners =
                 pokerTable.evaluateAndGetWinners();
-        callback.onWinnerDialogShow(pokerPlayerWinners, () -> {
-            evalWaitingOnUserInput = false;
-        });
+        callback.onWinnerDialogShow(pokerPlayerWinners);
         this.evalWaitingOnUserInput = true;
         while (this.evalWaitingOnUserInput) {
             SleepUtil.sleep(10);
@@ -243,6 +241,10 @@ public class PokerGameThread extends Thread {
         this.turnButtonPressed = true;
     }
 
+    void setEvalWaitingOnUserInput() {
+        this.evalWaitingOnUserInput = false;
+    }
+
     void foldCurrentPlayer() {
         this.pokerTable.foldCurrentPlayer();
         setTurnButtonPressed();
@@ -260,10 +262,6 @@ public class PokerGameThread extends Thread {
 
         void onVibrate();
 
-        void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners, UserInputCallback userInputCallback);
-
-        interface UserInputCallback {
-            void onUserInput();
-        }
+        void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners);
     }
 }
