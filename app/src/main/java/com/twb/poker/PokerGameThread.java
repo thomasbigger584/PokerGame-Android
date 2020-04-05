@@ -26,11 +26,11 @@ public class PokerGameThread extends Thread implements PokerTable.ThreadCallback
 
     private PokerTable pokerTable;
 
-    private PokerGameThreadCallback callback;
+    private PokerGameThreadCallback gameThreadCallback;
 
     PokerGameThread(PokerGameThreadCallback gameThreadCallback) {
         setName(PokerGameThread.class.getSimpleName());
-        this.callback = gameThreadCallback;
+        this.gameThreadCallback = gameThreadCallback;
         this.pokerTable = new PokerTable(gameThreadCallback, this);
         this.pokerTable.addPlayer("Thomas", true);
         for (int index = 0; index < 5; index++) {
@@ -88,7 +88,7 @@ public class PokerGameThread extends Thread implements PokerTable.ThreadCallback
     private void eval() {
         List<PokerPlayer> pokerPlayerWinners =
                 pokerTable.evaluateAndGetWinners();
-        callback.onWinnerDialogShow(pokerPlayerWinners);
+        gameThreadCallback.onWinnerDialogShow(pokerPlayerWinners);
         this.evalWaitingOnUserInput = true;
         while (this.evalWaitingOnUserInput) {
             SleepUtil.sleep(10);
@@ -119,22 +119,22 @@ public class PokerGameThread extends Thread implements PokerTable.ThreadCallback
 
     @Override
     public void onCurrentPlayerBetTurn(PokerPlayer pokerPlayer) {
-        callback.onAlert();
-        callback.onControlsShow();
+        gameThreadCallback.onAlert();
+        gameThreadCallback.onControlsShow();
 
         this.turnButtonPressed = false;
         for (double turnSecondsLeft = PLAYER_RESPONSE_TIME_IN_SECONDS; turnSecondsLeft >= 0;
              turnSecondsLeft = turnSecondsLeft - PLAYER_RESPONSE_LOOP_IN_SECONDS) {
             int percentage = calculatePercentage(turnSecondsLeft);
-            callback.onPercentageTimeLeft(percentage);
+            gameThreadCallback.onPercentageTimeLeft(percentage);
 
             if (turnButtonPressed) {
-                callback.onControlsHide();
+                gameThreadCallback.onControlsHide();
                 break;
             }
             if (turnSecondsLeft - PLAYER_RESPONSE_LOOP_IN_SECONDS <= 0) {
                 pokerPlayer.setFolded(true);
-                callback.onControlsHide();
+                gameThreadCallback.onControlsHide();
             }
             playerTurnSleep();
         }
@@ -142,7 +142,7 @@ public class PokerGameThread extends Thread implements PokerTable.ThreadCallback
 
     @Override
     public void onOtherPlayerBetTurn(PokerPlayer pokerPlayer) {
-        callback.onControlsHide();
+        gameThreadCallback.onControlsHide();
         dealSleep();
     }
 
