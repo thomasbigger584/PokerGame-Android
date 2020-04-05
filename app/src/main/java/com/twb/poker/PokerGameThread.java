@@ -1,13 +1,7 @@
 package com.twb.poker;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import androidx.annotation.MainThread;
 
-import com.twb.poker.domain.Card;
-import com.twb.poker.domain.CommunityCardType;
-import com.twb.poker.domain.DeckOfCardsFactory;
 import com.twb.poker.domain.PokerPlayer;
 import com.twb.poker.domain.PokerTable;
 import com.twb.poker.domain.RoundState;
@@ -17,31 +11,32 @@ import java.util.List;
 
 import static android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY;
 import static android.os.Process.setThreadPriority;
+import static com.twb.poker.util.SleepUtil.PLAYER_RESPONSE_LOOP_IN_SECONDS;
 import static com.twb.poker.util.SleepUtil.dealSleep;
 import static com.twb.poker.util.SleepUtil.gameDelaySleep;
 import static com.twb.poker.util.SleepUtil.playerTurnSleep;
 import static com.twb.poker.util.SleepUtil.roundDelaySleep;
 
-public class PokerGameThread extends Thread {
-    private static final String TAG = PokerGameThread.class.getSimpleName();
+public class PokerGameThread extends Thread implements PokerTable.PokerThreadCallback {
     private static final int PLAYER_RESPONSE_TIME_IN_SECONDS = 30;
-    private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
 
-    private final Handler uiHandler;
-    private List<Card> deckOfCards;
-    private PokerTable pokerTable;
-    private int deckCardPointer;
-    private RoundState roundState;
-    private PokerGameThreadCallback callback;
-    private boolean turnButtonPressed = false;
+    private static final String TAG = PokerGameThread.class.getSimpleName();
+
     private boolean evalWaitingOnUserInput = false;
+    private boolean turnButtonPressed = false;
 
+    private PokerTable pokerTable;
 
-    PokerGameThread(PokerTable pokerTable, PokerGameThreadCallback callback) {
+    private PokerGameThreadCallback callback;
+
+    PokerGameThread(PokerGameThreadCallback callback) {
         setName(PokerGameThread.class.getSimpleName());
-        this.uiHandler = new Handler(Looper.getMainLooper());
-        this.pokerTable = pokerTable;
         this.callback = callback;
+        this.pokerTable = new PokerTable(callback, this);
+        this.pokerTable.addPlayer("Thomas", true);
+        for (int index = 0; index < 5; index++) {
+            this.pokerTable.addPlayer();
+        }
     }
 
     @Override
@@ -49,40 +44,34 @@ public class PokerGameThread extends Thread {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY);
 
         while (pokerTable.size() > 1) {
-            initGame();
+            RoundState roundState = RoundState.INIT_DEAL;
+            pokerTable.init();
+
+//            todo update poker player on table
 
             while (roundState != RoundState.FINISH) {
                 switch (roundState) {
                     case INIT_DEAL: {
-                        initDeal();
+                        pokerTable.initDeal();
                         break;
                     }
-                    case INIT_DEAL_BET: {
-                        initDealBet();
+                    case INIT_DEAL_BET:
+                    case FLOP_DEAL_BET:
+                    case RIVER_DEAL_BET:
+                    case TURN_DEAL_BET: {
+                        pokerTable.performPlayerBetTurn();
                         break;
                     }
                     case FLOP_DEAL: {
-                        flopDeal();
-                        break;
-                    }
-                    case FLOP_DEAL_BET: {
-                        flopDealBet();
+                        pokerTable.flopDeal();
                         break;
                     }
                     case RIVER_DEAL: {
-                        riverDeal();
-                        break;
-                    }
-                    case RIVER_DEAL_BET: {
-                        riverDealBet();
+                        pokerTable.riverDeal();
                         break;
                     }
                     case TURN_DEAL: {
-                        turnDeal();
-                        break;
-                    }
-                    case TURN_DEAL_BET: {
-                        turnDealBet();
+                        pokerTable.turnDeal();
                         break;
                     }
                     case EVAL: {
@@ -97,62 +86,6 @@ public class PokerGameThread extends Thread {
         finishGame();
     }
 
-    private void initGame() {
-        this.pokerTable.reset();
-
-        this.pokerTable = this.pokerTable.reassignPokerTableForDealer();
-
-        this.deckCardPointer = 0;
-        this.roundState = RoundState.INIT_DEAL;
-        this.deckOfCards = DeckOfCardsFactory.getCards(true);
-
-        this.pokerTable.initPokerTable();
-    }
-
-    private void initDeal() {
-        for (int dealRoundIndex = 0; dealRoundIndex < NO_CARDS_FOR_PLAYER_DEAL; dealRoundIndex++) {
-            for (PokerPlayer pokerPlayer : pokerTable) {
-                final Card cardToDeal = deckOfCards.get(deckCardPointer);
-                pokerPlayer.update(cardToDeal);
-                deckCardPointer++;
-                dealSleep();
-            }
-        }
-    }
-
-    private void initDealBet() {
-        performPlayerBetTurn();
-    }
-
-    private void flopDeal() {
-        dealCommunityCard(CommunityCardType.BURN_PRE_FLOP);
-        dealCommunityCard(CommunityCardType.FLOP_1);
-        dealCommunityCard(CommunityCardType.FLOP_2);
-        dealCommunityCard(CommunityCardType.FLOP_3);
-    }
-
-    private void flopDealBet() {
-        performPlayerBetTurn();
-    }
-
-    private void turnDeal() {
-        dealCommunityCard(CommunityCardType.BURN_PRE_TURN);
-        dealCommunityCard(CommunityCardType.TURN);
-    }
-
-    private void turnDealBet() {
-        performPlayerBetTurn();
-    }
-
-    private void riverDeal() {
-        dealCommunityCard(CommunityCardType.BURN_PRE_RIVER);
-        dealCommunityCard(CommunityCardType.RIVER);
-    }
-
-    private void riverDealBet() {
-        performPlayerBetTurn();
-    }
-
     private void eval() {
         List<PokerPlayer> pokerPlayerWinners =
                 pokerTable.evaluateAndGetWinners();
@@ -163,67 +96,6 @@ public class PokerGameThread extends Thread {
         }
     }
 
-    private void performPlayerBetTurn() {
-        for (int index = 0; index < pokerTable.size(); index++) {
-            PokerPlayer prevPokerPlayer = pokerTable.getPrevious(index);
-            PokerPlayer thisPokerPlayer = pokerTable.get(index);
-            prevPokerPlayer.setTurnPlayer(false);
-            if (thisPokerPlayer.isFolded()) {
-                continue;
-            }
-            thisPokerPlayer.setTurnPlayer(true);
-
-            if (thisPokerPlayer.isCurrentPlayer()) {
-                uiHandler.post(() -> {
-                    this.callback.onVibrate();
-                    this.callback.onControlsShow();
-                });
-
-                this.turnButtonPressed = false;
-
-                for (double turnSecondsLeft = PLAYER_RESPONSE_TIME_IN_SECONDS; turnSecondsLeft >= 0;
-                     turnSecondsLeft = turnSecondsLeft - SleepUtil.PLAYER_RESPONSE_LOOP_IN_SECONDS) {
-
-                    int percentage = calculatePercentage(turnSecondsLeft);
-                    uiHandler.post(() -> {
-                        callback.onPercentageTimeLeft(percentage);
-                    });
-                    if (turnButtonPressed) {
-                        uiHandler.post(() -> {
-                            callback.onControlsHide();
-                        });
-                        break;
-                    }
-
-                    if (turnSecondsLeft - SleepUtil.PLAYER_RESPONSE_LOOP_IN_SECONDS <= 0) {
-                        thisPokerPlayer.setFolded(true);
-                        uiHandler.post(() -> {
-                            callback.onControlsHide();
-                        });
-                    }
-                    playerTurnSleep();
-                }
-            } else {
-                uiHandler.post(() -> {
-                    callback.onControlsHide();
-                });
-                dealSleep();
-            }
-        }
-        pokerTable.get(pokerTable.size() - 1).setTurnPlayer(false);
-    }
-
-    private int calculatePercentage(double secondsLeft) {
-        return (int) Math.round(secondsLeft * 100 / PLAYER_RESPONSE_TIME_IN_SECONDS);
-    }
-
-    private void dealCommunityCard(CommunityCardType cardType) {
-        final Card card = deckOfCards.get(deckCardPointer);
-        pokerTable.dealCommunityCard(card, cardType);
-        deckCardPointer++;
-        dealSleep();
-    }
-
     private void finishRound() {
         this.pokerTable.rotateDealer();
         roundDelaySleep();
@@ -231,10 +103,6 @@ public class PokerGameThread extends Thread {
 
     private void finishGame() {
         gameDelaySleep();
-    }
-
-    private void toast(final String message) {
-        uiHandler.post(() -> callback.toast(message));
     }
 
     void setTurnButtonPressed() {
@@ -250,18 +118,41 @@ public class PokerGameThread extends Thread {
         setTurnButtonPressed();
     }
 
+    @Override
+    public void onCurrentPlayerBetTurn(PokerPlayer pokerPlayer) {
+        callback.onAlert();
+        callback.onControlsShow();
+
+        this.turnButtonPressed = false;
+        for (double turnSecondsLeft = PLAYER_RESPONSE_TIME_IN_SECONDS; turnSecondsLeft >= 0;
+             turnSecondsLeft = turnSecondsLeft - PLAYER_RESPONSE_LOOP_IN_SECONDS) {
+            int percentage = calculatePercentage(turnSecondsLeft);
+            callback.onPercentageTimeLeft(percentage);
+
+            if (turnButtonPressed) {
+                callback.onControlsHide();
+                break;
+            }
+            if (turnSecondsLeft - PLAYER_RESPONSE_LOOP_IN_SECONDS <= 0) {
+                pokerPlayer.setFolded(true);
+                callback.onControlsHide();
+            }
+            playerTurnSleep();
+        }
+    }
+
+    @Override
+    public void onOtherPlayerBetTurn(PokerPlayer pokerPlayer) {
+        callback.onControlsHide();
+        dealSleep();
+    }
+
+    private int calculatePercentage(double secondsLeft) {
+        return (int) Math.round(secondsLeft * 100 / PLAYER_RESPONSE_TIME_IN_SECONDS);
+    }
+
     @MainThread
-    public interface PokerGameThreadCallback {
-        void toast(String message);
-
-        void onPercentageTimeLeft(int percentage);
-
-        void onControlsShow();
-
-        void onControlsHide();
-
-        void onVibrate();
-
+    public interface PokerGameThreadCallback extends PokerTable.PokerTableCallback {
         void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners);
     }
 }

@@ -2,6 +2,7 @@ package com.twb.poker;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
@@ -12,10 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.github.javafaker.Faker;
+import com.twb.poker.domain.Card;
+import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.PokerPlayer;
 import com.twb.poker.domain.PokerTable;
 import com.twb.poker.layout.BetRaiseDialog;
@@ -24,24 +25,24 @@ import com.twb.poker.layout.CommunityCardLayout;
 import com.twb.poker.layout.PokerDialog;
 import com.twb.poker.layout.WinnersDialog;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
-import java.util.Random;
 
 import static com.twb.poker.layout.BetRaiseDialog.DialogType.BET;
 import static com.twb.poker.layout.BetRaiseDialog.DialogType.RAISE;
 
-public class PokerGameActivity extends AppCompatActivity
-        implements PokerGameThread.PokerGameThreadCallback, Thread.UncaughtExceptionHandler {
+public class PokerGameActivity extends AppCompatActivity implements PokerGameThread.PokerGameThreadCallback {
     private static final int VIBRATE_LENGTH_IN_MS = 500;
+    private Handler handler = new Handler();
 
+    private PokerTable pokerTable;
     private PokerGameThread pokerGameThread;
+
     private LinearLayout pokerGameLinearLayout;
     private GridLayout controlsGridLayout;
     private PokerDialog pokerDialog;
-    private PokerTable pokerTable;
+
     private ProgressBar secondsLeftProgressBar;
+    private CommunityCardLayout communityCardLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +67,7 @@ public class PokerGameActivity extends AppCompatActivity
         final CardPairLayout tablePlayer5CardPairLayout = pokerGameLinearLayout.
                 findViewById(R.id.tablePlayer5CardPairLayout);
 
-        final CommunityCardLayout communityCardLayout = findViewById(R.id.communityCardLayout);
+        communityCardLayout = findViewById(R.id.communityCardLayout);
 
         controlsGridLayout = findViewById(R.id.controlsGridLayout);
         final Button checkButton = controlsGridLayout.findViewById(R.id.checkButton);
@@ -87,24 +88,9 @@ public class PokerGameActivity extends AppCompatActivity
 
         secondsLeftProgressBar = pokerGameLinearLayout.findViewById(R.id.secondsLeftProgressBar);
 
-        pokerTable = new PokerTable(communityCardLayout);
-        pokerTable.addPlayer(playerCardPairLayout, "Thomas", generateRandomFunds(100, 300), true);
-        pokerTable.addPlayer(tablePlayer1CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
-        pokerTable.addPlayer(tablePlayer2CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
-        pokerTable.addPlayer(tablePlayer3CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
-        pokerTable.addPlayer(tablePlayer4CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
-        pokerTable.addPlayer(tablePlayer5CardPairLayout, generateRandomName(), generateRandomFunds(75, 200), false);
-    }
+        createPokerGameThread();
 
-    private String generateRandomName() {
-        return new Faker().name().firstName();
-    }
 
-    private double generateRandomFunds(int rangeMin, int rangeMax) {
-        Random r = new Random();
-        double funds = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
-        BigDecimal bd = new BigDecimal(funds).setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();
     }
 
     @Override
@@ -115,44 +101,30 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     private void startGameThread() {
-        if (pokerGameThread == null) {
-            pokerGameThread = new PokerGameThread(pokerTable, this);
-            pokerGameThread.setUncaughtExceptionHandler(this);
-        }
+        createPokerGameThread();
         if (!pokerGameThread.isAlive()) {
             pokerGameThread.start();
         }
     }
 
-    @Override
-    public void toast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPercentageTimeLeft(int percentage) {
-        secondsLeftProgressBar.setProgress(percentage);
-    }
-
-    @Override
-    public void onControlsShow() {
-        controlsGridLayout.setVisibility(View.VISIBLE);
-        secondsLeftProgressBar.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onControlsHide() {
-        dismissPokerDialog();
-        if (controlsGridLayout.getVisibility() != View.GONE) {
-            controlsGridLayout.setVisibility(View.GONE);
-        }
-        if (secondsLeftProgressBar.getVisibility() != View.INVISIBLE) {
-            secondsLeftProgressBar.setVisibility(View.INVISIBLE);
+    private void createPokerGameThread() {
+        if (pokerGameThread == null) {
+            pokerGameThread = new PokerGameThread(this);
+            pokerGameThread.setUncaughtExceptionHandler((t, e) -> toast(e.getMessage()));
         }
     }
 
     @Override
-    public void onVibrate() {
+    public void dealCommunityCard(Card card, CommunityCardType cardType) {
+        handler.post(() -> {
+            if (cardType.isPlayable()) {
+                communityCardLayout.dealCard(card, cardType);
+            }
+        });
+    }
+
+    @Override
+    public void onAlert() {
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         if (vibrator == null) {
             return;
@@ -162,6 +134,34 @@ public class PokerGameActivity extends AppCompatActivity
         } else {
             vibrator.vibrate(VIBRATE_LENGTH_IN_MS);
         }
+    }
+
+    @Override
+    public void onPercentageTimeLeft(int percentage) {
+        handler.post(() -> {
+            secondsLeftProgressBar.setProgress(percentage);
+        });
+    }
+
+    @Override
+    public void onControlsShow() {
+        handler.post(() -> {
+            controlsGridLayout.setVisibility(View.VISIBLE);
+            secondsLeftProgressBar.setVisibility(View.VISIBLE);
+        });
+    }
+
+    @Override
+    public void onControlsHide() {
+        dismissPokerDialog();
+        handler.post(() -> {
+            if (controlsGridLayout.getVisibility() != View.GONE) {
+                controlsGridLayout.setVisibility(View.GONE);
+            }
+            if (secondsLeftProgressBar.getVisibility() != View.INVISIBLE) {
+                secondsLeftProgressBar.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     @Override
@@ -206,8 +206,7 @@ public class PokerGameActivity extends AppCompatActivity
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
-    @Override
-    public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
-        toast(e.getMessage());
+    private void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
