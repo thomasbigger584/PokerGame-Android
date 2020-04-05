@@ -18,17 +18,17 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
     private static final int NO_DEALER = -1;
 
-    private final PokerTableCallback pokerTableCallback;
-    private final PokerThreadCallback pokerThreadCallback;
+    private final ActivityCallback activityCallback;
+    private final ThreadCallback threadCallback;
 
     private final CommunityCards communityCards = new CommunityCards();
     private List<Card> deckOfCards;
     private int deckCardPointer;
 
-    public PokerTable(PokerTableCallback pokerTableCallback,
-                      PokerThreadCallback pokerThreadCallback) {
-        this.pokerTableCallback = pokerTableCallback;
-        this.pokerThreadCallback = pokerThreadCallback;
+    public PokerTable(ActivityCallback activityCallback,
+                      ThreadCallback threadCallback) {
+        this.activityCallback = activityCallback;
+        this.threadCallback = threadCallback;
     }
 
     /*
@@ -94,9 +94,9 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             }
             thisPokerPlayer.setTurnPlayer(true);
             if (thisPokerPlayer.isCurrentPlayer()) {
-                pokerThreadCallback.onCurrentPlayerBetTurn(thisPokerPlayer);
+                threadCallback.onCurrentPlayerBetTurn(thisPokerPlayer);
             } else {
-                pokerThreadCallback.onOtherPlayerBetTurn(thisPokerPlayer);
+                threadCallback.onOtherPlayerBetTurn(thisPokerPlayer);
             }
         }
         get(size() - 1).setTurnPlayer(false);
@@ -128,7 +128,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
 
     private void dealCommunityCard(final Card card, CommunityCardType cardType) {
         communityCards.add(card);
-        pokerTableCallback.dealCommunityCard(card, cardType);
+        activityCallback.dealCommunityCard(card, cardType);
     }
 
 
@@ -266,7 +266,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         }
     }
 
-    public interface PokerTableCallback {
+    public interface ActivityCallback {
         void dealCommunityCard(Card card, CommunityCardType cardType);
 
         void onAlert();
@@ -278,7 +278,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         void onPercentageTimeLeft(int percentage);
     }
 
-    public interface PokerThreadCallback {
+    public interface ThreadCallback {
         void onCurrentPlayerBetTurn(PokerPlayer pokerPlayer);
 
         void onOtherPlayerBetTurn(PokerPlayer pokerPlayer);

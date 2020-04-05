@@ -17,10 +17,9 @@ import static com.twb.poker.util.SleepUtil.gameDelaySleep;
 import static com.twb.poker.util.SleepUtil.playerTurnSleep;
 import static com.twb.poker.util.SleepUtil.roundDelaySleep;
 
-public class PokerGameThread extends Thread implements PokerTable.PokerThreadCallback {
-    private static final int PLAYER_RESPONSE_TIME_IN_SECONDS = 30;
-
+public class PokerGameThread extends Thread implements PokerTable.ThreadCallback {
     private static final String TAG = PokerGameThread.class.getSimpleName();
+    private static final int PLAYER_RESPONSE_TIME_IN_SECONDS = 30;
 
     private boolean evalWaitingOnUserInput = false;
     private boolean turnButtonPressed = false;
@@ -29,10 +28,10 @@ public class PokerGameThread extends Thread implements PokerTable.PokerThreadCal
 
     private PokerGameThreadCallback callback;
 
-    PokerGameThread(PokerGameThreadCallback callback) {
+    PokerGameThread(PokerGameThreadCallback gameThreadCallback) {
         setName(PokerGameThread.class.getSimpleName());
-        this.callback = callback;
-        this.pokerTable = new PokerTable(callback, this);
+        this.callback = gameThreadCallback;
+        this.pokerTable = new PokerTable(gameThreadCallback, this);
         this.pokerTable.addPlayer("Thomas", true);
         for (int index = 0; index < 5; index++) {
             this.pokerTable.addPlayer();
@@ -152,7 +151,7 @@ public class PokerGameThread extends Thread implements PokerTable.PokerThreadCal
     }
 
     @MainThread
-    public interface PokerGameThreadCallback extends PokerTable.PokerTableCallback {
+    public interface PokerGameThreadCallback extends PokerTable.ActivityCallback {
         void onWinnerDialogShow(List<PokerPlayer> pokerPlayerWinners);
     }
 }
