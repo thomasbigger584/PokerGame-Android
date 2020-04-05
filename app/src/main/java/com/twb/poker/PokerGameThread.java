@@ -85,38 +85,6 @@ public class PokerGameThread extends Thread implements PokerTable.ThreadCallback
         finishGame();
     }
 
-    private void eval() {
-        List<PokerPlayer> pokerPlayerWinners =
-                pokerTable.evaluateAndGetWinners();
-        gameThreadCallback.onWinnerDialogShow(pokerPlayerWinners);
-        this.evalWaitingOnUserInput = true;
-        while (this.evalWaitingOnUserInput) {
-            SleepUtil.sleep(10);
-        }
-    }
-
-    private void finishRound() {
-        this.pokerTable.rotateDealer();
-        roundDelaySleep();
-    }
-
-    private void finishGame() {
-        gameDelaySleep();
-    }
-
-    void setTurnButtonPressed() {
-        this.turnButtonPressed = true;
-    }
-
-    void setEvalWaitingOnUserInput() {
-        this.evalWaitingOnUserInput = false;
-    }
-
-    void foldCurrentPlayer() {
-        this.pokerTable.foldCurrentPlayer();
-        setTurnButtonPressed();
-    }
-
     @Override
     public void onCurrentPlayerBetTurn(PokerPlayer pokerPlayer) {
         gameThreadCallback.onAlert();
@@ -144,6 +112,38 @@ public class PokerGameThread extends Thread implements PokerTable.ThreadCallback
     public void onOtherPlayerBetTurn(PokerPlayer pokerPlayer) {
         gameThreadCallback.onControlsHide();
         dealSleep();
+    }
+
+    private void eval() {
+        List<PokerPlayer> pokerPlayerWinners = pokerTable.evaluateAndGetWinners();
+        gameThreadCallback.onWinnerDialogShow(pokerPlayerWinners);
+
+        this.evalWaitingOnUserInput = true;
+        while (this.evalWaitingOnUserInput) {
+            SleepUtil.sleep(10);
+        }
+    }
+
+    private void finishRound() {
+        this.pokerTable.rotateDealer();
+        roundDelaySleep();
+    }
+
+    private void finishGame() {
+        gameDelaySleep();
+    }
+
+    void setTurnButtonPressed() {
+        this.turnButtonPressed = true;
+    }
+
+    void setEvalWaitingOnUserInput() {
+        this.evalWaitingOnUserInput = false;
+    }
+
+    void foldCurrentPlayer() {
+        this.pokerTable.foldCurrentPlayer();
+        setTurnButtonPressed();
     }
 
     private int calculatePercentage(double secondsLeft) {
