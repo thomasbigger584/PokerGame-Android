@@ -39,10 +39,10 @@ public class CardPairLayout extends FrameLayout {
         displayNameTextView = inflatedView.findViewById(R.id.displayNameTextView);
         fundsTextView = inflatedView.findViewById(R.id.fundsTextView);
         dealerChipLayout = inflatedView.findViewById(R.id.dealerChipLayout);
-        clear();
+        reset();
     }
 
-    public void clear() {
+    public void reset() {
         for (ImageView imageView : cardImageViews) {
             imageView.setVisibility(INVISIBLE);
         }
@@ -55,7 +55,7 @@ public class CardPairLayout extends FrameLayout {
 
         if (cardImageViews[0].getVisibility() != INVISIBLE &&
                 cardImageViews[1].getVisibility() != INVISIBLE) {
-            clear();
+            reset();
         }
         if (cardImageViews[0].getVisibility() == INVISIBLE) {
             cardImageViews[0].setImageResource(cardDrawResId);

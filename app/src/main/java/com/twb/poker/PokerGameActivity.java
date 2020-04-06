@@ -183,8 +183,9 @@ public class PokerGameActivity extends AppCompatActivity
     @Override
     public void reset() {
         for (CardPairLayout cardPairLayout : cardPairLayouts) {
-            cardPairLayout.clear();
+            cardPairLayout.reset();
         }
+        communityCardLayout.reset();
     }
 
     private void showBetDialog() {

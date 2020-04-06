@@ -78,20 +78,18 @@ public class CommunityCardLayout extends FrameLayout {
     }
 
     public void setFlopVisibility() {
-        uiHandler.post(() -> {
-            community1CardLayout.setVisibility(VISIBLE);
-            community2CardLayout.setVisibility(VISIBLE);
-            community3CardLayout.setVisibility(VISIBLE);
-        });
+        community1CardLayout.setVisibility(VISIBLE);
+        community2CardLayout.setVisibility(VISIBLE);
+        community3CardLayout.setVisibility(VISIBLE);
     }
 
     public void setRiverVisibility() {
-        uiHandler.post(() -> community4CardLayout.setVisibility(VISIBLE));
+        community4CardLayout.setVisibility(VISIBLE);
 
     }
 
     public void setTurnVisibility() {
-        uiHandler.post(() -> community5CardLayout.setVisibility(VISIBLE));
+        community5CardLayout.setVisibility(VISIBLE);
     }
 
     public void setInvisible() {

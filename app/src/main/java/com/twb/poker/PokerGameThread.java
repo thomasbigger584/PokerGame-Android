@@ -50,7 +50,9 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
 
         while (pokerTable.size() > 1) {
             RoundState roundState = RoundState.INIT_DEAL;
-            callback.reset();
+            UI.post(() -> {
+                callback.reset();
+            });
             pokerTable.init();
 
             while (roundState != RoundState.FINISH) {
