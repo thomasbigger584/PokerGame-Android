@@ -24,7 +24,13 @@ public class PokerDialog extends DialogFragment {
         }
     }
 
-    void setFullScreen() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        setFullScreen();
+    }
+
+    private void setFullScreen() {
         inflatedView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE

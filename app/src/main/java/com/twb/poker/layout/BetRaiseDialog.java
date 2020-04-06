@@ -38,7 +38,6 @@ public class BetRaiseDialog extends PokerDialog {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         inflatedView = inflater.inflate(R.layout.fragment_bet_raise_dialog, container, false);
-        setFullScreen();
 
         titleTextView = inflatedView.findViewById(R.id.titleTextView);
 

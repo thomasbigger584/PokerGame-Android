@@ -22,7 +22,6 @@ import static com.twb.poker.util.SleepUtil.playerTurnSleep;
 import static com.twb.poker.util.SleepUtil.roundDelaySleep;
 
 public class PokerGameThread extends Thread implements PokerTable.PokerTableCallback {
-    private static final String TAG = PokerGameThread.class.getSimpleName();
     private static final Handler UI = new Handler();
 
     private static final int PLAYER_RESPONSE_TIME_IN_SECONDS = 30;
@@ -31,16 +30,15 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     private boolean turnButtonPressed = false;
 
     private PokerTable pokerTable;
-
     private PokerGameThreadCallback callback;
 
     PokerGameThread(PokerGameThreadCallback callback) {
         setName(PokerGameThread.class.getSimpleName());
         this.callback = callback;
-        this.pokerTable = new PokerTable(this);
-        this.pokerTable.addPlayer("Thomas", true, 0);
+        pokerTable = new PokerTable(this);
+        pokerTable.addPlayer("Thomas", true, 0);
         for (int index = 1; index <= 5; index++) {
-            this.pokerTable.addPlayer(index);
+            pokerTable.addPlayer(index);
         }
     }
 
@@ -114,7 +112,7 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
             callback.onAlert();
             callback.onControlsShow();
         });
-        this.turnButtonPressed = false;
+        turnButtonPressed = false;
         for (double turnSecondsLeft = PLAYER_RESPONSE_TIME_IN_SECONDS; turnSecondsLeft >= 0;
              turnSecondsLeft = turnSecondsLeft - PLAYER_RESPONSE_LOOP_IN_SECONDS) {
             returnPercentageLeft(turnSecondsLeft);
@@ -165,8 +163,8 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     private void eval() {
         List<PokerPlayer> pokerPlayerWinners = pokerTable.evaluateAndGetWinners();
         callback.onWinnerDialogShow(pokerPlayerWinners);
-        this.evalWaitingOnUserInput = true;
-        while (this.evalWaitingOnUserInput) {
+        evalWaitingOnUserInput = true;
+        while (evalWaitingOnUserInput) {
             SleepUtil.sleep(10);
         }
     }
@@ -181,15 +179,15 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     }
 
     void setTurnButtonPressed() {
-        this.turnButtonPressed = true;
+        turnButtonPressed = true;
     }
 
     void setEvalWaitingOnUserInput() {
-        this.evalWaitingOnUserInput = false;
+        evalWaitingOnUserInput = false;
     }
 
     void foldCurrentPlayer() {
-        this.pokerTable.foldCurrentPlayer();
+        pokerTable.foldCurrentPlayer();
         setTurnButtonPressed();
     }
 

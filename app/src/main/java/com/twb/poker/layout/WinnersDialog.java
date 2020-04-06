@@ -38,8 +38,6 @@ public class WinnersDialog extends PokerDialog {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         inflatedView = inflater.inflate(R.layout.fragment_winner_dialog, container, false);
 
-        setFullScreen();
-
         TextView titleTextView = inflatedView.findViewById(R.id.titleTextView);
         titleTextView.setText(toastWinners());
 

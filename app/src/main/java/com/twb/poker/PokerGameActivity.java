@@ -110,7 +110,8 @@ public class PokerGameActivity extends AppCompatActivity
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(VIBRATE_LENGTH_IN_MS, VibrationEffect.DEFAULT_AMPLITUDE));
+            vibrator.vibrate(VibrationEffect.
+                    createOneShot(VIBRATE_LENGTH_IN_MS, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
             vibrator.vibrate(VIBRATE_LENGTH_IN_MS);
         }

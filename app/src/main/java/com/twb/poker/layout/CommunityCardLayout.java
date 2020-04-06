@@ -1,8 +1,6 @@
 package com.twb.poker.layout;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -12,9 +10,6 @@ import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 
 public class CommunityCardLayout extends FrameLayout {
-
-    private Handler uiHandler = new Handler(Looper.getMainLooper());
-
     private CardLayout community1CardLayout;
     private CardLayout community2CardLayout;
     private CardLayout community3CardLayout;
