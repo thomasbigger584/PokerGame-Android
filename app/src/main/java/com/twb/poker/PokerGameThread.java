@@ -49,12 +49,11 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY);
 
         while (pokerTable.size() > 1) {
-            RoundState roundState = RoundState.INIT_DEAL;
-            UI.post(() -> {
-                callback.reset();
-            });
+            UI.post(() -> callback.reset());
+
             pokerTable.init();
 
+            RoundState roundState = RoundState.INIT_DEAL;
             while (roundState != RoundState.FINISH) {
                 switch (roundState) {
                     case INIT_DEAL: {
@@ -138,39 +137,29 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
 
     @Override
     public void onOtherPlayerBetTurn(PokerPlayer pokerPlayer) {
-        UI.post(() -> {
-            callback.onControlsHide();
-        });
+        UI.post(() -> callback.onControlsHide());
         dealSleep();
     }
 
     @Override
     public void onDealCardToPlayer(PokerPlayer pokerPlayer, Card card) {
-        UI.post(() -> {
-            callback.onDealCardToPlayer(pokerPlayer, card);
-        });
+        UI.post(() -> callback.onDealCardToPlayer(pokerPlayer, card));
         dealSleep();
     }
 
     @Override
     public void onPlayerTurn(PokerPlayer pokerPlayer, boolean turn) {
-        UI.post(() -> {
-            callback.onPlayerTurn(pokerPlayer, turn);
-        });
+        UI.post(() -> callback.onPlayerTurn(pokerPlayer, turn));
     }
 
     @Override
     public void onPlayerDealer(PokerPlayer pokerPlayer, boolean dealer) {
-        UI.post(() -> {
-            callback.onPlayerDealer(pokerPlayer, dealer);
-        });
+        UI.post(() -> callback.onPlayerDealer(pokerPlayer, dealer));
     }
 
     @Override
     public void onPlayerFold(PokerPlayer pokerPlayer) {
-        UI.post(() -> {
-            callback.onPlayerFold(pokerPlayer);
-        });
+        UI.post(() -> callback.onPlayerFold(pokerPlayer));
     }
 
     private void eval() {
