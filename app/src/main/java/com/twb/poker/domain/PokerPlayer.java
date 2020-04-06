@@ -16,6 +16,8 @@ public class PokerPlayer {
 
     private final boolean currentPlayer;
 
+    private final int tableIndex;
+
     private boolean dealerPlayer;
 
     private Hand hand = new Hand();
@@ -24,32 +26,12 @@ public class PokerPlayer {
 
     private boolean folded;
 
-    public void update(final Card card) {
-//        cardPairLayout.updateCardImageView(card);
+    void update(final Card card) {
         hand.update(card);
     }
 
-    public void updatePokerPlayerOnTable() {
-        String displayName = playerUser.getDisplayName();
-//        cardPairLayout.updateDisplayNameTextView(displayName);
-        PlayerBank playerBank = playerUser.getBank();
-//        cardPairLayout.updateFundsTextView(playerBank.getFunds());
-//        cardPairLayout.updateDealerChip(dealerPlayer);
-    }
-
-    public void setTurnPlayer(boolean turnPlayer) {
-        this.turnPlayer = turnPlayer;
-//        cardPairLayout.updateTurnPlayer(turnPlayer);
-    }
-
-    public void setFolded(boolean folded) {
-        this.folded = folded;
-//        cardPairLayout.updateFolded(folded);
-    }
-
-    public void reset() {
+    void reset() {
         this.folded = false;
         this.hand = new Hand();
-//        cardPairLayout.reset();
     }
 }

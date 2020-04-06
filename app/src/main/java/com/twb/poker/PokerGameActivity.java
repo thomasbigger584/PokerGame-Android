@@ -2,7 +2,6 @@ package com.twb.poker;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
@@ -18,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
 import com.twb.poker.domain.PokerPlayer;
-import com.twb.poker.domain.PokerTable;
 import com.twb.poker.layout.BetRaiseDialog;
 import com.twb.poker.layout.CardPairLayout;
 import com.twb.poker.layout.CommunityCardLayout;
@@ -30,45 +28,34 @@ import java.util.List;
 import static com.twb.poker.layout.BetRaiseDialog.DialogType.BET;
 import static com.twb.poker.layout.BetRaiseDialog.DialogType.RAISE;
 
-public class PokerGameActivity extends AppCompatActivity implements PokerGameThread.PokerGameThreadCallback {
+public class PokerGameActivity extends AppCompatActivity
+        implements PokerGameThread.PokerGameThreadCallback {
     private static final int VIBRATE_LENGTH_IN_MS = 500;
-    private Handler handler = new Handler();
 
-    private PokerTable pokerTable;
     private PokerGameThread pokerGameThread;
 
     private LinearLayout pokerGameLinearLayout;
     private GridLayout controlsGridLayout;
-    private PokerDialog pokerDialog;
-
-    private ProgressBar secondsLeftProgressBar;
     private CommunityCardLayout communityCardLayout;
+    private PokerDialog pokerDialog;
+    private ProgressBar secondsLeftProgressBar;
+
+    private CardPairLayout[] cardPairLayouts = new CardPairLayout[6];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_poker_game);
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         pokerGameLinearLayout = findViewById(R.id.pokerGameLinearLayout);
-
-        final CardPairLayout playerCardPairLayout =
-                pokerGameLinearLayout.findViewById(R.id.playerCardPairLayout);
-
-        final CardPairLayout tablePlayer1CardPairLayout = pokerGameLinearLayout.
-                findViewById(R.id.tablePlayer1CardPairLayout);
-        final CardPairLayout tablePlayer2CardPairLayout = pokerGameLinearLayout.
-                findViewById(R.id.tablePlayer2CardPairLayout);
-        final CardPairLayout tablePlayer3CardPairLayout = pokerGameLinearLayout.
-                findViewById(R.id.tablePlayer3CardPairLayout);
-        final CardPairLayout tablePlayer4CardPairLayout = pokerGameLinearLayout.
-                findViewById(R.id.tablePlayer4CardPairLayout);
-        final CardPairLayout tablePlayer5CardPairLayout = pokerGameLinearLayout.
-                findViewById(R.id.tablePlayer5CardPairLayout);
-
+        cardPairLayouts[0] = pokerGameLinearLayout.findViewById(R.id.playerCardPairLayout);
+        cardPairLayouts[1] = pokerGameLinearLayout.findViewById(R.id.tablePlayer1CardPairLayout);
+        cardPairLayouts[2] = pokerGameLinearLayout.findViewById(R.id.tablePlayer2CardPairLayout);
+        cardPairLayouts[3] = pokerGameLinearLayout.findViewById(R.id.tablePlayer3CardPairLayout);
+        cardPairLayouts[4] = pokerGameLinearLayout.findViewById(R.id.tablePlayer4CardPairLayout);
+        cardPairLayouts[5] = pokerGameLinearLayout.findViewById(R.id.tablePlayer5CardPairLayout);
         communityCardLayout = findViewById(R.id.communityCardLayout);
-
         controlsGridLayout = findViewById(R.id.controlsGridLayout);
         final Button checkButton = controlsGridLayout.findViewById(R.id.checkButton);
         checkButton.setOnClickListener(v -> {
@@ -85,12 +72,7 @@ public class PokerGameActivity extends AppCompatActivity implements PokerGameThr
         raiseButton.setOnClickListener(v -> {
             showRaiseDialog();
         });
-
         secondsLeftProgressBar = pokerGameLinearLayout.findViewById(R.id.secondsLeftProgressBar);
-
-        createPokerGameThread();
-
-
     }
 
     @Override
@@ -115,12 +97,10 @@ public class PokerGameActivity extends AppCompatActivity implements PokerGameThr
     }
 
     @Override
-    public void dealCommunityCard(Card card, CommunityCardType cardType) {
-        handler.post(() -> {
-            if (cardType.isPlayable()) {
-                communityCardLayout.dealCard(card, cardType);
-            }
-        });
+    public void onUpdatePokerPlayer(PokerPlayer pokerPlayer) {
+        int tableIndex = pokerPlayer.getTableIndex();
+        CardPairLayout cardPairLayout = cardPairLayouts[tableIndex];
+        cardPairLayout.updateDetails(pokerPlayer);
     }
 
     @Override
@@ -138,30 +118,57 @@ public class PokerGameActivity extends AppCompatActivity implements PokerGameThr
 
     @Override
     public void onPercentageTimeLeft(int percentage) {
-        handler.post(() -> {
-            secondsLeftProgressBar.setProgress(percentage);
-        });
+        secondsLeftProgressBar.setProgress(percentage);
+    }
+
+    @Override
+    public void onDealCommunityCard(Card card, CommunityCardType cardType) {
+        communityCardLayout.dealCard(card, cardType);
+    }
+
+    @Override
+    public void onDealCardToPlayer(PokerPlayer pokerPlayer, Card card) {
+        int tableIndex = pokerPlayer.getTableIndex();
+        CardPairLayout cardPairLayout = cardPairLayouts[tableIndex];
+        cardPairLayout.updateCardImageView(card);
+    }
+
+    @Override
+    public void onPlayerTurn(PokerPlayer pokerPlayer, boolean turn) {
+        int tableIndex = pokerPlayer.getTableIndex();
+        CardPairLayout cardPairLayout = cardPairLayouts[tableIndex];
+        cardPairLayout.updateTurnPlayer(turn);
+    }
+
+    @Override
+    public void onPlayerFold(PokerPlayer pokerPlayer) {
+        int tableIndex = pokerPlayer.getTableIndex();
+        CardPairLayout cardPairLayout = cardPairLayouts[tableIndex];
+        cardPairLayout.fold();
+    }
+
+    @Override
+    public void onPlayerDealer(PokerPlayer pokerPlayer, boolean dealer) {
+        int tableIndex = pokerPlayer.getTableIndex();
+        CardPairLayout cardPairLayout = cardPairLayouts[tableIndex];
+        cardPairLayout.updateDealerChip(dealer);
     }
 
     @Override
     public void onControlsShow() {
-        handler.post(() -> {
-            controlsGridLayout.setVisibility(View.VISIBLE);
-            secondsLeftProgressBar.setVisibility(View.VISIBLE);
-        });
+        controlsGridLayout.setVisibility(View.VISIBLE);
+        secondsLeftProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onControlsHide() {
         dismissPokerDialog();
-        handler.post(() -> {
-            if (controlsGridLayout.getVisibility() != View.GONE) {
-                controlsGridLayout.setVisibility(View.GONE);
-            }
-            if (secondsLeftProgressBar.getVisibility() != View.INVISIBLE) {
-                secondsLeftProgressBar.setVisibility(View.INVISIBLE);
-            }
-        });
+        if (controlsGridLayout.getVisibility() != View.GONE) {
+            controlsGridLayout.setVisibility(View.GONE);
+        }
+        if (secondsLeftProgressBar.getVisibility() != View.INVISIBLE) {
+            secondsLeftProgressBar.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -171,6 +178,13 @@ public class PokerGameActivity extends AppCompatActivity implements PokerGameThr
             pokerGameThread.setEvalWaitingOnUserInput();
         });
         pokerDialog.show(getSupportFragmentManager());
+    }
+
+    @Override
+    public void reset() {
+        for (CardPairLayout cardPairLayout : cardPairLayouts) {
+            cardPairLayout.clear();
+        }
     }
 
     private void showBetDialog() {

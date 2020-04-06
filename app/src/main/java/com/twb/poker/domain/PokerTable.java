@@ -7,53 +7,51 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import static com.twb.poker.util.GenerateUtil.generateRandomFunds;
 import static com.twb.poker.util.GenerateUtil.generateRandomName;
 import static com.twb.poker.util.SleepUtil.dealSleep;
 
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class PokerTable extends ArrayList<PokerPlayer> {
     private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
     private static final int NO_DEALER = -1;
 
-    private final ActivityCallback activityCallback;
-    private final ThreadCallback threadCallback;
+    private final PokerTableCallback callback;
 
     private final CommunityCards communityCards = new CommunityCards();
     private List<Card> deckOfCards;
     private int deckCardPointer;
 
-    public PokerTable(ActivityCallback activityCallback,
-                      ThreadCallback threadCallback) {
-        this.activityCallback = activityCallback;
-        this.threadCallback = threadCallback;
+    public PokerTable(PokerTableCallback callback) {
+        this.callback = callback;
     }
 
     /*
      * Player Functionality
      */
-
-    private void addPlayer(String displayName, double funds, boolean currentPlayer) {
+    private void addPlayer(String displayName, double funds, boolean currentPlayer, int tableOrder) {
         PlayerBank playerBank = new PlayerBank(funds);
         PlayerUser playerUser = new PlayerUser(displayName, playerBank);
-        PokerPlayer pokerPlayer = new PokerPlayer(playerUser, currentPlayer);
+        PokerPlayer pokerPlayer = new PokerPlayer(playerUser, currentPlayer, tableOrder);
         add(pokerPlayer);
     }
 
-    public void addPlayer(String displayName, boolean currentPlayer) {
+    public void addPlayer(String displayName, boolean currentPlayer, int tableOrder) {
         double funds;
         if (currentPlayer) {
             funds = generateRandomFunds(100, 300);
         } else {
             funds = generateRandomFunds(75, 200);
         }
-        addPlayer(displayName, funds, currentPlayer);
+        addPlayer(displayName, funds, currentPlayer, tableOrder);
     }
 
-    public void addPlayer() {
-        addPlayer(generateRandomName(), false);
+    public void addPlayer(int tableOrder) {
+        addPlayer(generateRandomName(), false, tableOrder);
     }
 
     /*
@@ -64,22 +62,15 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         reassignPokerTableForDealer();
         this.deckCardPointer = 0;
         this.deckOfCards = DeckOfCardsFactory.getCards(true);
-        initPokerTable();
-    }
-
-    public void initPokerTable() {
-        for (PokerPlayer pokerPlayer : this) {
-            pokerPlayer.updatePokerPlayerOnTable();
-        }
+        callback.onUpdatePlayersOnTable(this);
     }
 
     public void initDeal() {
         for (int dealRoundIndex = 0; dealRoundIndex < NO_CARDS_FOR_PLAYER_DEAL; dealRoundIndex++) {
             for (PokerPlayer pokerPlayer : this) {
-                final Card cardToDeal = deckOfCards.get(deckCardPointer);
-                pokerPlayer.update(cardToDeal);
-                deckCardPointer++;
-                dealSleep();
+                Card card = getCard();
+                pokerPlayer.update(card);
+                callback.onDealCardToPlayer(pokerPlayer, card);
             }
         }
     }
@@ -88,18 +79,18 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         for (int index = 0; index < size(); index++) {
             PokerPlayer prevPokerPlayer = getPrevious(index);
             PokerPlayer thisPokerPlayer = get(index);
-            prevPokerPlayer.setTurnPlayer(false);
+            setTurnPlayer(prevPokerPlayer, false);
             if (thisPokerPlayer.isFolded()) {
                 continue;
             }
-            thisPokerPlayer.setTurnPlayer(true);
+            setTurnPlayer(thisPokerPlayer, true);
             if (thisPokerPlayer.isCurrentPlayer()) {
-                threadCallback.onCurrentPlayerBetTurn(thisPokerPlayer);
+                callback.onCurrentPlayerBetTurn(thisPokerPlayer);
             } else {
-                threadCallback.onOtherPlayerBetTurn(thisPokerPlayer);
+                callback.onOtherPlayerBetTurn(thisPokerPlayer);
             }
         }
-        get(size() - 1).setTurnPlayer(false);
+        setTurnPlayer(get(size() - 1), false);
     }
 
     public void flopDeal() {
@@ -120,17 +111,17 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     }
 
     private void dealCommunityCard(CommunityCardType cardType) {
-        final Card card = deckOfCards.get(deckCardPointer);
-        dealCommunityCard(card, cardType);
-        deckCardPointer++;
+        Card card = getCard();
+        communityCards.add(card);
+        callback.onDealCommunityCard(card, cardType);
         dealSleep();
     }
 
-    private void dealCommunityCard(final Card card, CommunityCardType cardType) {
-        communityCards.add(card);
-        activityCallback.dealCommunityCard(card, cardType);
+    private Card getCard() {
+        final Card card = deckOfCards.get(deckCardPointer);
+        deckCardPointer++;
+        return card;
     }
-
 
     private void reassignPokerTableForDealer() {
         int dealerIndex = getDealerIndex();
@@ -172,17 +163,27 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         for (int index = 0; index < size(); index++) {
             PokerPlayer player = get(index);
             if (player.isDealerPlayer()) {
+                PokerPlayer newDealerPlayer;
                 if (index == size() - 1) {
-                    PokerPlayer firstPlayer = get(0);
-                    firstPlayer.setDealerPlayer(true);
+                    newDealerPlayer = get(0);
                 } else {
-                    PokerPlayer nextPlayer = get(index + 1);
-                    nextPlayer.setDealerPlayer(true);
+                    newDealerPlayer = get(index + 1);
                 }
-                player.setDealerPlayer(false);
+                setDealerPlayer(newDealerPlayer, true);
+                setDealerPlayer(player, false);
                 break;
             }
         }
+    }
+
+    private void setDealerPlayer(PokerPlayer pokerPlayer, boolean dealer) {
+        pokerPlayer.setDealerPlayer(dealer);
+        callback.onPlayerDealer(pokerPlayer, dealer);
+    }
+
+    private void setTurnPlayer(PokerPlayer pokerPlayer, boolean turn) {
+        pokerPlayer.setTurnPlayer(turn);
+        callback.onPlayerTurn(pokerPlayer, turn);
     }
 
     // return a list as there could be a winning tie
@@ -246,6 +247,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         PokerPlayer currentPlayer = getCurrentPlayer();
         if (currentPlayer != null) {
             currentPlayer.setFolded(true);
+            callback.onPlayerFold(currentPlayer);
         }
     }
 
@@ -259,28 +261,27 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     }
 
     private void reset() {
-//        communityCardLayout.reset();
         communityCards.clear();
         for (PokerPlayer pokerPlayer : this) {
             pokerPlayer.reset();
         }
     }
 
-    public interface ActivityCallback {
-        void dealCommunityCard(Card card, CommunityCardType cardType);
+    public interface PokerTableCallback {
+        void onUpdatePlayersOnTable(PokerTable pokerTable);
 
-        void onAlert();
-
-        void onControlsShow();
-
-        void onControlsHide();
-
-        void onPercentageTimeLeft(int percentage);
-    }
-
-    public interface ThreadCallback {
         void onCurrentPlayerBetTurn(PokerPlayer pokerPlayer);
 
         void onOtherPlayerBetTurn(PokerPlayer pokerPlayer);
+
+        void onDealCommunityCard(Card card, CommunityCardType cardType);
+
+        void onDealCardToPlayer(PokerPlayer pokerPlayer, Card card);
+
+        void onPlayerTurn(PokerPlayer pokerPlayer, boolean turn);
+
+        void onPlayerDealer(PokerPlayer pokerPlayer, boolean dealer);
+
+        void onPlayerFold(PokerPlayer pokerPlayer);
     }
 }

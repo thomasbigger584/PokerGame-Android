@@ -9,6 +9,9 @@ import android.widget.TextView;
 
 import com.twb.poker.R;
 import com.twb.poker.domain.Card;
+import com.twb.poker.domain.PlayerBank;
+import com.twb.poker.domain.PlayerUser;
+import com.twb.poker.domain.PokerPlayer;
 import com.twb.poker.util.CardToCardDrawableUtil;
 
 import java.util.Locale;
@@ -39,11 +42,7 @@ public class CardPairLayout extends FrameLayout {
         clear();
     }
 
-    public void reset() {
-        post(this::clear);
-    }
-
-    private void clear() {
+    public void clear() {
         for (ImageView imageView : cardImageViews) {
             imageView.setVisibility(INVISIBLE);
         }
@@ -51,59 +50,48 @@ public class CardPairLayout extends FrameLayout {
     }
 
     public void updateCardImageView(final Card card) {
-        post(() -> {
-            int cardDrawResId = CardToCardDrawableUtil.
-                    getDrawableResFromCard(getContext(), card);
+        int cardDrawResId = CardToCardDrawableUtil.
+                getDrawableResFromCard(getContext(), card);
 
-            if (cardImageViews[0].getVisibility() != INVISIBLE &&
-                    cardImageViews[1].getVisibility() != INVISIBLE) {
-                reset();
-            }
-            if (cardImageViews[0].getVisibility() == INVISIBLE) {
-                cardImageViews[0].setImageResource(cardDrawResId);
-                cardImageViews[0].setVisibility(VISIBLE);
-            } else if (cardImageViews[1].getVisibility() == INVISIBLE) {
-                cardImageViews[1].setImageResource(cardDrawResId);
-                cardImageViews[1].setVisibility(VISIBLE);
-            }
-        });
+        if (cardImageViews[0].getVisibility() != INVISIBLE &&
+                cardImageViews[1].getVisibility() != INVISIBLE) {
+            clear();
+        }
+        if (cardImageViews[0].getVisibility() == INVISIBLE) {
+            cardImageViews[0].setImageResource(cardDrawResId);
+            cardImageViews[0].setVisibility(VISIBLE);
+        } else if (cardImageViews[1].getVisibility() == INVISIBLE) {
+            cardImageViews[1].setImageResource(cardDrawResId);
+            cardImageViews[1].setVisibility(VISIBLE);
+        }
     }
 
-    public void updateFundsTextView(final Double funds) {
-        post(() -> {
-            fundsTextView.setText(String.format(Locale.getDefault(), "%.2f", funds));
-        });
-    }
+    public void updateDetails(PokerPlayer pokerPlayer) {
+        PlayerUser playerUser = pokerPlayer.getPlayerUser();
+        PlayerBank playerBank = playerUser.getBank();
+        String displayName = playerUser.getDisplayName();
+        displayNameTextView.setText(displayName);
 
-    public void updateDisplayNameTextView(final String displayName) {
-        post(() -> {
-            displayNameTextView.setText(displayName);
-        });
+        double funds = playerBank.getFunds();
+        fundsTextView.setText(String.format(Locale.getDefault(), "%.2f", funds));
     }
 
     public void updateDealerChip(boolean dealer) {
-        post(() -> {
-            final int visibility = (dealer) ? VISIBLE : GONE;
-            dealerChipLayout.setVisibility(visibility);
-        });
+        final int visibility = (dealer) ? VISIBLE : GONE;
+        dealerChipLayout.setVisibility(visibility);
     }
 
     public void updateTurnPlayer(boolean playerTurn) {
-        post(() -> {
-            if (playerTurn) {
-                inflatedView.setBackgroundResource(R.drawable.player_turn_border);
-            } else {
-                inflatedView.setBackground(null);
-            }
-        });
+        if (playerTurn) {
+            inflatedView.setBackgroundResource(R.drawable.player_turn_border);
+        } else {
+            inflatedView.setBackground(null);
+        }
     }
 
-    public void updateFolded(boolean folded) {
-        post(() -> {
-            int visibility = (folded) ? INVISIBLE : VISIBLE;
-            for (ImageView cardImageView : cardImageViews) {
-                cardImageView.setVisibility(visibility);
-            }
-        });
+    public void fold() {
+        for (ImageView cardImageView : cardImageViews) {
+            cardImageView.setVisibility(INVISIBLE);
+        }
     }
 }
