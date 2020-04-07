@@ -1,6 +1,10 @@
 package com.twb.poker.domain;
 
 
+import android.util.Log;
+
+import com.twb.poker.util.GenerateUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -12,19 +16,22 @@ import lombok.EqualsAndHashCode;
 
 import static com.twb.poker.util.GenerateUtil.generateRandomFunds;
 import static com.twb.poker.util.GenerateUtil.generateRandomName;
-import static com.twb.poker.util.SleepUtil.dealSleep;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PokerTable extends ArrayList<PokerPlayer> {
     private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
     private static final int NO_DEALER = -1;
-
+    private static final int BET_COUNT_AMOUNT = 1;
+    private static final int RAISE_COUNT_AMOUNT = 2;
+    private static final int INITIAL_BET_COUNT = 0;
+    private static final String TAG = PokerTable.class.getSimpleName();
     private final PokerTableCallback callback;
-
     private final CommunityCards communityCards = new CommunityCards();
     private List<Card> deckOfCards;
     private int deckCardPointer;
+    private Pot pot;
+    private double minimumBet = 50d;
 
     public PokerTable(PokerTableCallback callback) {
         this.callback = callback;
@@ -59,10 +66,19 @@ public class PokerTable extends ArrayList<PokerPlayer> {
      */
     public void init() {
         reset();
+        resetBets();
         reassignPokerTableForDealer();
         this.deckCardPointer = 0;
         this.deckOfCards = DeckOfCardsFactory.getCards(true);
         callback.onUpdatePlayersOnTable(this);
+    }
+
+    private void resetBets() {
+        for (PokerPlayer pokerPlayer : this) {
+            pokerPlayer.setBetCount(INITIAL_BET_COUNT);
+        }
+        pot = new Pot();
+        pot.setPot(0d);
     }
 
     public void initDeal() {
@@ -75,7 +91,19 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         }
     }
 
+    private boolean isMorePlayersToBet() {
+        for (PokerPlayer pokerPlayer : this) {
+            if (pokerPlayer.getBetCount() > INITIAL_BET_COUNT) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void performPlayerBetTurn() {
+
+//        while (isMorePlayersToBet()) {
+
         for (int index = 0; index < size(); index++) {
             PokerPlayer prevPokerPlayer = getPrevious(index);
             PokerPlayer thisPokerPlayer = get(index);
@@ -88,9 +116,29 @@ public class PokerTable extends ArrayList<PokerPlayer> {
                 callback.onCurrentPlayerBetTurn(thisPokerPlayer);
             } else {
                 callback.onOtherPlayerBetTurn(thisPokerPlayer);
+                performAiPlayerBet(thisPokerPlayer);
             }
         }
         setTurnPlayer(get(size() - 1), false);
+//        }
+    }
+
+    private void performAiPlayerBet(PokerPlayer pokerPlayer) {
+        BetType previousBetType = pot.getCurrentBetType();
+        BetType nextBetType;
+        if (previousBetType != null) {
+            nextBetType = previousBetType.getRandomAiBetType();
+        } else {
+            nextBetType = BetType.getInitialBetType();
+        }
+        if (nextBetType.isNonPayable()) {
+            setBetAmount(pokerPlayer, nextBetType);
+        } else {
+            PlayerUser playerUser = pokerPlayer.getPlayerUser();
+            PlayerBank playerBank = playerUser.getBank();
+            double randomBet = GenerateUtil.generateAiBet(minimumBet, playerBank.getFunds());
+            setBetAmount(pokerPlayer, nextBetType, randomBet);
+        }
     }
 
     public void flopDeal() {
@@ -114,7 +162,6 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         Card card = getCard();
         communityCards.add(card);
         callback.onDealCommunityCard(card, cardType);
-        dealSleep();
     }
 
     private Card getCard() {
@@ -163,14 +210,9 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         for (int index = 0; index < size(); index++) {
             PokerPlayer player = get(index);
             if (player.isDealerPlayer()) {
-                PokerPlayer newDealerPlayer;
-                if (index == size() - 1) {
-                    newDealerPlayer = get(0);
-                } else {
-                    newDealerPlayer = get(index + 1);
-                }
-                setDealerPlayer(newDealerPlayer, true);
+                PokerPlayer newDealerPlayer = getNext(index);
                 setDealerPlayer(player, false);
+                setDealerPlayer(newDealerPlayer, true);
                 break;
             }
         }
@@ -189,12 +231,14 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     // return a list as there could be a winning tie
     public List<PokerPlayer> evaluateAndGetWinners() {
         List<Card> playableCards = communityCards.getPlayableCards();
-
         //using copy as dont want to sort the existing table.
         List<PokerPlayer> copyPokerTable = new ArrayList<>(this);
 
         removeFoldedPlayers(copyPokerTable);
 
+        if (copyPokerTable.isEmpty()) {
+            return Collections.emptyList();
+        }
         for (PokerPlayer pokerPlayer : copyPokerTable) {
             Hand hand = pokerPlayer.getHand();
             hand.setCommunityCards(playableCards);
@@ -207,14 +251,18 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         });
 
         List<PokerPlayer> handWinners = new ArrayList<>();
-        int winningRankValue = copyPokerTable.get(0).getHand().getRank();
+        PokerPlayer winningPokerPlayer = copyPokerTable.get(0);
+        Hand winningHand = winningPokerPlayer.getHand();
+        if (winningHand == null) {
+            return Collections.emptyList();
+        }
+        int winningRankValue = winningHand.getRank();
         for (PokerPlayer pokerPlayer : copyPokerTable) {
             Hand hand = pokerPlayer.getHand();
             if (hand.getRank() == winningRankValue) {
                 handWinners.add(pokerPlayer);
             }
         }
-
         //sort cards in hand in ascending order
         for (PokerPlayer pokerPlayer : handWinners) {
             Collections.sort(pokerPlayer.getHand(), (o1, o2) -> {
@@ -235,23 +283,14 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         }
     }
 
-    private PokerPlayer getPrevious(int index) {
-        if (index == 0) {
-            return get(size() - 1);
-        } else {
-            return get(index - 1);
-        }
-    }
-
     public void foldCurrentPlayer() {
         PokerPlayer currentPlayer = getCurrentPlayer();
         if (currentPlayer != null) {
-            currentPlayer.setFolded(true);
-            callback.onPlayerFold(currentPlayer);
+            setBetAmount(currentPlayer, BetType.FOLD);
         }
     }
 
-    private PokerPlayer getCurrentPlayer() {
+    public PokerPlayer getCurrentPlayer() {
         for (PokerPlayer pokerPlayer : this) {
             if (pokerPlayer.isCurrentPlayer()) {
                 return pokerPlayer;
@@ -260,10 +299,67 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         return null;
     }
 
+    private PokerPlayer getPrevious(int index) {
+        if (index == 0) {
+            return get(size() - 1);
+        } else {
+            return get(index - 1);
+        }
+    }
+
+    private PokerPlayer getNext(int index) {
+        if (index == size() - 1) {
+            return get(0);
+        } else {
+            return get(index + 1);
+        }
+    }
+
     private void reset() {
+        pot = new Pot();
         communityCards.clear();
         for (PokerPlayer pokerPlayer : this) {
             pokerPlayer.reset();
+        }
+    }
+
+    private void setBetAmount(PokerPlayer pokerPlayer, BetType type) {
+        setBetAmount(pokerPlayer, type, null);
+    }
+
+    public void setBetAmount(PokerPlayer pokerPlayer, BetType type, Double amount) {
+        Log.e(TAG, "");
+        if (type == BetType.FOLD) {
+            pokerPlayer.setBetCount(INITIAL_BET_COUNT);
+            pokerPlayer.setFolded(true);
+            callback.onPlayerFold(pokerPlayer);
+            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " folded");
+            return;
+        }
+        pot.setCurrentBetType(type);
+        if (type == BetType.CHECK) {
+            pokerPlayer.setBetCount(INITIAL_BET_COUNT);
+            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " checked");
+            return;
+        }
+        if (amount != null) {
+            PlayerUser playerUser = pokerPlayer.getPlayerUser();
+            PlayerBank playerBank = playerUser.getBank();
+            playerBank.setFunds(playerBank.getFunds() - amount);
+
+            pot.setCurrentBet(amount);
+            pot.setPot(pot.getPot() + amount);
+            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " increased pot by " + amount);
+        }
+        if (type == BetType.BET) {
+            pokerPlayer.setBetCount(pokerPlayer.getBetCount() + BET_COUNT_AMOUNT);
+            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " bet " + amount);
+        } else if (type == BetType.RAISE) {
+            pokerPlayer.setBetCount(pokerPlayer.getBetCount() + RAISE_COUNT_AMOUNT);
+            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " raised by " + amount);
+        } else if (type == BetType.CALL) {
+            pokerPlayer.setBetCount(INITIAL_BET_COUNT);
+            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " called " + amount);
         }
     }
 

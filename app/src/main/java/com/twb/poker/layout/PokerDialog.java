@@ -1,13 +1,16 @@
 package com.twb.poker.layout;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class PokerDialog extends DialogFragment {
+    private static final String TAG = PokerDialog.class.getSimpleName();
     private static final float DIM_AMOUNT = 0.5f;
 
     View inflatedView;
@@ -41,5 +44,17 @@ public class PokerDialog extends DialogFragment {
 
     public void show(FragmentManager manager) {
         super.show(manager, getClass().getSimpleName());
+    }
+
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        try {
+            FragmentTransaction ft = manager.beginTransaction();
+            ft.add(this, tag);
+            ft.commit();
+        } catch (IllegalStateException e) {
+            Log.d(TAG, "Exception", e);
+        }
     }
 }

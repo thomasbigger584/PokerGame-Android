@@ -14,8 +14,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.twb.poker.domain.BetType;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
+import com.twb.poker.domain.PlayerBank;
 import com.twb.poker.domain.PokerPlayer;
 import com.twb.poker.layout.BetRaiseDialog;
 import com.twb.poker.layout.CardPairLayout;
@@ -25,11 +27,8 @@ import com.twb.poker.layout.WinnersDialog;
 
 import java.util.List;
 
-import static com.twb.poker.layout.BetRaiseDialog.DialogType.BET;
-import static com.twb.poker.layout.BetRaiseDialog.DialogType.RAISE;
-
 public class PokerGameActivity extends AppCompatActivity
-        implements PokerGameThread.PokerGameThreadCallback {
+        implements PokerGameThread.PokerGameThreadCallback, BetRaiseDialog.BetRaiseClickListener {
     private static final int VIBRATE_LENGTH_IN_MS = 500;
 
     private PokerGameThread pokerGameThread;
@@ -156,7 +155,7 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     @Override
-    public void onControlsShow() {
+    public void onControlsShow(PokerPlayer pokerPlayer) {
         controlsGridLayout.setVisibility(View.VISIBLE);
         secondsLeftProgressBar.setVisibility(View.VISIBLE);
     }
@@ -191,18 +190,22 @@ public class PokerGameActivity extends AppCompatActivity
 
     private void showBetDialog() {
         dismissPokerDialog();
-        pokerDialog = BetRaiseDialog.newInstance(BET, amount -> {
-            toast("Bet: " + amount);
-        });
-        pokerDialog.show(getSupportFragmentManager());
+        PlayerBank playerBank = pokerGameThread.getCurrentBank();
+        if (playerBank != null) {
+            double funds = playerBank.getFunds();
+            pokerDialog = BetRaiseDialog.newInstance(BetType.BET, funds, this);
+            pokerDialog.show(getSupportFragmentManager());
+        }
     }
 
     private void showRaiseDialog() {
         dismissPokerDialog();
-        pokerDialog = BetRaiseDialog.newInstance(RAISE, amount -> {
-            toast("Raise: " + amount);
-        });
-        pokerDialog.show(getSupportFragmentManager());
+        PlayerBank playerBank = pokerGameThread.getCurrentBank();
+        if (playerBank != null) {
+            double funds = playerBank.getFunds();
+            pokerDialog = BetRaiseDialog.newInstance(BetType.RAISE, funds, this);
+            pokerDialog.show(getSupportFragmentManager());
+        }
     }
 
     private void dismissPokerDialog() {
@@ -224,5 +227,10 @@ public class PokerGameActivity extends AppCompatActivity
 
     private void toast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAmountSelected(BetType type, double amount) {
+        pokerGameThread.onAmountSelected(type, amount);
     }
 }

@@ -39,7 +39,7 @@ public class WinnersDialog extends PokerDialog {
         inflatedView = inflater.inflate(R.layout.fragment_winner_dialog, container, false);
 
         TextView titleTextView = inflatedView.findViewById(R.id.titleTextView);
-        titleTextView.setText(toastWinners());
+        titleTextView.setText(getWinnersString());
 
         CardLayout[] cardLayouts = new CardLayout[7];
         cardLayouts[0] = inflatedView.findViewById(R.id.card1CardLayout);
@@ -50,12 +50,14 @@ public class WinnersDialog extends PokerDialog {
         cardLayouts[5] = inflatedView.findViewById(R.id.card6CardLayout);
         cardLayouts[6] = inflatedView.findViewById(R.id.card7CardLayout);
 
-        PokerPlayer winningPokerPlayer = pokerPlayerWinnersList.get(0);
-        Hand winningHand = winningPokerPlayer.getHand();
-        for (int index = 0; index < cardLayouts.length; index++) {
-            CardLayout cardLayout = cardLayouts[index];
-            Card card = winningHand.get(index);
-            cardLayout.update(card);
+        if (!pokerPlayerWinnersList.isEmpty()) {
+            PokerPlayer winningPokerPlayer = pokerPlayerWinnersList.get(0);
+            Hand winningHand = winningPokerPlayer.getHand();
+            for (int index = 0; index < cardLayouts.length; index++) {
+                CardLayout cardLayout = cardLayouts[index];
+                Card card = winningHand.get(index);
+                cardLayout.update(card);
+            }
         }
         Button successButton = inflatedView.findViewById(R.id.successButton);
         successButton.setOnClickListener(v -> {
@@ -67,7 +69,7 @@ public class WinnersDialog extends PokerDialog {
         return inflatedView;
     }
 
-    private String toastWinners() {
+    private String getWinnersString() {
         if (pokerPlayerWinnersList.size() == 1) {
             PokerPlayer winningPokerPlayer = pokerPlayerWinnersList.get(0);
             PlayerUser playerUser = winningPokerPlayer.getPlayerUser();
@@ -75,7 +77,7 @@ public class WinnersDialog extends PokerDialog {
             HandType handType = hand.getType();
             String handTypeStr = handType.getValue();
             return playerUser.getDisplayName() + " wins with a " + handTypeStr;
-        } else {
+        } else if (!pokerPlayerWinnersList.isEmpty()) {
             StringBuilder winnersString = new StringBuilder();
             for (int index = 0; index < pokerPlayerWinnersList.size(); index++) {
                 PokerPlayer winningPokerPlayer = pokerPlayerWinnersList.get(index);
@@ -85,11 +87,13 @@ public class WinnersDialog extends PokerDialog {
                     winnersString.append(", ");
                 }
             }
-            Hand singleHand = pokerPlayerWinnersList.get(0).getHand();
-            HandType handType = singleHand.getType();
+            PokerPlayer pokerPlayer = pokerPlayerWinnersList.get(0);
+            Hand hand = pokerPlayer.getHand();
+            HandType handType = hand.getType();
             String handTypeStr = handType.getValue();
             return winnersString.toString() + " split the pot with " + handTypeStr;
         }
+        return "No hand to show";
     }
 
     public interface WinnersClickListener {

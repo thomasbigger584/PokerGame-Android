@@ -4,8 +4,11 @@ import android.os.Handler;
 
 import androidx.annotation.MainThread;
 
+import com.twb.poker.domain.BetType;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
+import com.twb.poker.domain.PlayerBank;
+import com.twb.poker.domain.PlayerUser;
 import com.twb.poker.domain.PokerPlayer;
 import com.twb.poker.domain.PokerTable;
 import com.twb.poker.domain.RoundState;
@@ -92,6 +95,7 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     @Override
     public void onDealCommunityCard(Card card, CommunityCardType cardType) {
         UI.post(() -> callback.onDealCommunityCard(card, cardType));
+        dealSleep();
     }
 
     @Override
@@ -110,7 +114,7 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     public void onCurrentPlayerBetTurn(PokerPlayer pokerPlayer) {
         UI.post(() -> {
             callback.onAlert();
-            callback.onControlsShow();
+            callback.onControlsShow(pokerPlayer);
         });
         turnButtonPressed = false;
         for (double turnSecondsLeft = PLAYER_RESPONSE_TIME_IN_SECONDS; turnSecondsLeft >= 0;
@@ -195,11 +199,29 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
         return (int) Math.round(secondsLeft * 100 / PLAYER_RESPONSE_TIME_IN_SECONDS);
     }
 
+    PlayerBank getCurrentBank() {
+        PokerPlayer pokerPlayer = pokerTable.getCurrentPlayer();
+        if (pokerPlayer == null) {
+            return null;
+        }
+        PlayerUser playerUser = pokerPlayer.getPlayerUser();
+        return playerUser.getBank();
+    }
+
+    void onAmountSelected(BetType type, double amount) {
+        PokerPlayer pokerPlayer = pokerTable.getCurrentPlayer();
+        if (pokerPlayer == null) {
+            return;
+        }
+        pokerTable.setBetAmount(pokerPlayer, type, amount);
+        setTurnButtonPressed();
+    }
+
     @MainThread
     public interface PokerGameThreadCallback {
         void onAlert();
 
-        void onControlsShow();
+        void onControlsShow(PokerPlayer pokerPlayer);
 
         void onControlsHide();
 

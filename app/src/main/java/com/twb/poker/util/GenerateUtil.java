@@ -21,4 +21,18 @@ public class GenerateUtil {
         BigDecimal bd = new BigDecimal(funds).setScale(2, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
+
+    public static double generateAiBet(double min, double max) {
+        double newMin = min * 2;
+        double newMax = (max / 3) * 2;
+
+        if (newMin < newMax) {
+            newMin = min;
+            newMax = max;
+        }
+        Random r = new Random();
+        double funds = newMin + (newMax - newMin) * r.nextDouble();
+        BigDecimal bd = new BigDecimal(funds).setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
 }

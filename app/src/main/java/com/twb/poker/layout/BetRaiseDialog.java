@@ -12,23 +12,25 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.twb.poker.R;
+import com.twb.poker.domain.BetType;
 import com.twb.poker.util.SeekBarChangeListenerBase;
 
 import java.math.BigDecimal;
 import java.util.Locale;
 
 public class BetRaiseDialog extends PokerDialog {
-    private static final float PLAYER_BANK_AMOUNT = 2871.23f;
     private BetRaiseClickListener betRaiseListener;
-    private DialogType type;
+    private BetType type;
     private TextView titleTextView;
     private SeekBar betRaiseSeekBar;
-    private float amountSelected;
+    private double playerCurrentFunds;
+    private double amountSelected;
 
-    public static BetRaiseDialog newInstance(DialogType type, BetRaiseClickListener listener) {
+    public static BetRaiseDialog newInstance(BetType type, double playerCurrentFunds, BetRaiseClickListener listener) {
         BetRaiseDialog fragment = new BetRaiseDialog();
         fragment.betRaiseListener = listener;
         fragment.type = type;
+        fragment.playerCurrentFunds = playerCurrentFunds;
         fragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
         Bundle bundle = new Bundle();
         fragment.setArguments(bundle);
@@ -40,7 +42,6 @@ public class BetRaiseDialog extends PokerDialog {
         inflatedView = inflater.inflate(R.layout.fragment_bet_raise_dialog, container, false);
 
         titleTextView = inflatedView.findViewById(R.id.titleTextView);
-
         betRaiseSeekBar = inflatedView.findViewById(R.id.betRaiseSeekBar);
         betRaiseSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListenerBase() {
             @Override
@@ -52,16 +53,16 @@ public class BetRaiseDialog extends PokerDialog {
         Button successButton = inflatedView.findViewById(R.id.successButton);
         successButton.setOnClickListener(v -> {
             if (betRaiseListener != null) {
-                betRaiseListener.onAmountSelected(amountSelected);
+                betRaiseListener.onAmountSelected(type, amountSelected);
             }
         });
 
-        setSeekBar(PLAYER_BANK_AMOUNT);
+        setSeekBar(playerCurrentFunds);
 
         return inflatedView;
     }
 
-    private void setTitleTextView(float amount) {
+    private void setTitleTextView(double amount) {
         amountSelected = round(amount);
         switch (type) {
             case BET: {
@@ -77,28 +78,23 @@ public class BetRaiseDialog extends PokerDialog {
         }
     }
 
-    private void setSeekBar(float amount) {
-        float seekbarAmount = amount * 100;
+    private void setSeekBar(double amount) {
+        double seekbarAmount = amount * 100;
         betRaiseSeekBar.setMax((int) seekbarAmount);
 
-        //todo: set this to the minimum bet. for now its 10 percent
-        float defaultAmount = seekbarAmount / 10;
+        double defaultAmount = seekbarAmount / 10;
         betRaiseSeekBar.setProgress((int) defaultAmount);
 
         setTitleTextView(defaultAmount / 100);
     }
 
-    private float round(float amount) {
-        BigDecimal bd = new BigDecimal(Float.toString(amount));
+    private double round(double amount) {
+        BigDecimal bd = new BigDecimal(Double.toString(amount));
         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-        return bd.floatValue();
-    }
-
-    public enum DialogType {
-        BET, RAISE
+        return bd.doubleValue();
     }
 
     public interface BetRaiseClickListener {
-        void onAmountSelected(float amount);
+        void onAmountSelected(BetType type, double amount);
     }
 }

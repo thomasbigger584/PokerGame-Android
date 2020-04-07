@@ -26,6 +26,8 @@ public class PokerPlayer {
 
     private boolean folded;
 
+    private int betCount = 0;
+
     void update(final Card card) {
         hand.update(card);
     }

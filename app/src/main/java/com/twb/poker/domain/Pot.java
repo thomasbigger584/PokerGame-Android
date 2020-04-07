@@ -4,5 +4,8 @@ import lombok.Data;
 
 @Data
 public class Pot {
-    private float pot;
+    private double pot;
+
+    private double currentBet;
+    private BetType currentBetType;
 }
