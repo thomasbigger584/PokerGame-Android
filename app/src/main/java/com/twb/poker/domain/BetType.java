@@ -7,7 +7,7 @@ public enum BetType {
 
     public static BetType getInitialBetType() {
         WeightedRandomCollection<BetType> initialBetTypes = new WeightedRandomCollection<>();
-        initialBetTypes.add(40, CHECK).add(40, BET).add(20, FOLD);
+        initialBetTypes.add(60, CHECK).add(40, BET);
         return initialBetTypes.next();
     }
 
