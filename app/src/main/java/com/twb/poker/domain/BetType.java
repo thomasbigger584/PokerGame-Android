@@ -7,7 +7,9 @@ public enum BetType {
 
     public static BetType getInitialBetType() {
         WeightedRandomCollection<BetType> initialBetTypes = new WeightedRandomCollection<>();
-        initialBetTypes.add(60, CHECK).add(40, BET);
+        initialBetTypes.
+                add(65, CHECK).
+                add(35, BET);
         return initialBetTypes.next();
     }
 
@@ -26,16 +28,24 @@ public enum BetType {
         WeightedRandomCollection<BetType> nextBetTypes = new WeightedRandomCollection<>();
         switch (betType) {
             case CHECK: {
-                return nextBetTypes.add(75, CHECK).add(25, BET);
+                return nextBetTypes.
+                        add(80, CHECK).
+                        add(20, BET);
             }
             case CALL: {
-                return nextBetTypes.add(55, CALL).add(35, RAISE).add(10, FOLD);
+                return nextBetTypes.
+                        add(70, CALL).
+                        add(20, RAISE).
+                        add(10, FOLD);
             }
             case RAISE: {
-                return nextBetTypes.add(25, CALL).add(75, FOLD);
+                return nextBetTypes.
+                        add(70, CALL).
+                        add(30, FOLD);
             }
             default: {
-                return nextBetTypes.add(100, FOLD);
+                return nextBetTypes.
+                        add(100, FOLD);
             }
         }
     }
