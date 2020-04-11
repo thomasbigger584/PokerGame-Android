@@ -13,7 +13,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.twb.poker.chatbox.ChatBoxRecyclerAdapter;
 import com.twb.poker.domain.BetType;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
@@ -35,11 +38,13 @@ public class PokerGameActivity extends AppCompatActivity
 
     private LinearLayout pokerGameLinearLayout;
     private GridLayout controlsGridLayout;
+    private RecyclerView chatBoxRecyclerView;
     private CommunityCardLayout communityCardLayout;
     private PokerDialog pokerDialog;
     private ProgressBar secondsLeftProgressBar;
 
     private CardPairLayout[] cardPairLayouts = new CardPairLayout[6];
+    private ChatBoxRecyclerAdapter chatBoxAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +61,12 @@ public class PokerGameActivity extends AppCompatActivity
         cardPairLayouts[5] = pokerGameLinearLayout.findViewById(R.id.tablePlayer5CardPairLayout);
         communityCardLayout = findViewById(R.id.communityCardLayout);
         controlsGridLayout = findViewById(R.id.controlsGridLayout);
+        chatBoxRecyclerView = pokerGameLinearLayout.findViewById(R.id.chatBoxRecyclerView);
+        setupChatBoxRecyclerView();
+
         final Button checkButton = controlsGridLayout.findViewById(R.id.checkButton);
         checkButton.setOnClickListener(v -> {
-            pokerGameThread.setTurnButtonPressed();
+            pokerGameThread.checkCurrentPlayer();
         });
         final Button foldButton = controlsGridLayout.findViewById(R.id.foldButton);
         foldButton.setOnClickListener(v -> {
@@ -72,6 +80,17 @@ public class PokerGameActivity extends AppCompatActivity
             showRaiseDialog();
         });
         secondsLeftProgressBar = pokerGameLinearLayout.findViewById(R.id.secondsLeftProgressBar);
+    }
+
+    private void setupChatBoxRecyclerView() {
+        chatBoxRecyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        chatBoxRecyclerView.setLayoutManager(layoutManager);
+
+        chatBoxAdapter = new ChatBoxRecyclerAdapter();
+        chatBoxRecyclerView.setAdapter(chatBoxAdapter);
     }
 
     @Override
@@ -181,11 +200,18 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     @Override
-    public void reset() {
+    public void onReset() {
         for (CardPairLayout cardPairLayout : cardPairLayouts) {
             cardPairLayout.reset();
         }
         communityCardLayout.reset();
+    }
+
+    @Override
+    public void onEvent(String event) {
+        chatBoxAdapter.add(event);
+        int itemCount = chatBoxAdapter.getItemCount();
+        chatBoxRecyclerView.scrollToPosition(itemCount - 1);
     }
 
     private void showBetDialog() {

@@ -50,7 +50,7 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY);
 
         while (pokerTable.size() > 1) {
-            UI.post(() -> callback.reset());
+            UI.post(() -> callback.onReset());
 
             pokerTable.init();
 
@@ -164,6 +164,11 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
         UI.post(() -> callback.onPlayerFold(pokerPlayer));
     }
 
+    @Override
+    public void onEvent(String event) {
+        UI.post(() -> callback.onEvent(event));
+    }
+
     private void eval() {
         List<PokerPlayer> pokerPlayerWinners = pokerTable.evaluateAndGetWinners();
         callback.onWinnerDialogShow(pokerPlayerWinners);
@@ -188,6 +193,14 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
 
     void setEvalWaitingOnUserInput() {
         evalWaitingOnUserInput = false;
+    }
+
+    void checkCurrentPlayer() {
+        setTurnButtonPressed();
+        PokerPlayer pokerPlayer = pokerTable.getCurrentPlayer();
+        UI.post(() -> {
+            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " checked");
+        });
     }
 
     void foldCurrentPlayer() {
@@ -241,6 +254,8 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
 
         void onPlayerDealer(PokerPlayer pokerPlayer, boolean dealer);
 
-        void reset();
+        void onReset();
+
+        void onEvent(String event);
     }
 }

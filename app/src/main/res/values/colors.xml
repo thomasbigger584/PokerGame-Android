@@ -6,6 +6,8 @@
     <color name="colorPrimaryDark">#FF047EAC</color>
     <color name="colorAccent">#FF1A2866</color>
 
+    <color name="colorWhite">#FFFFFF</color>
+
     <color name="colorBackgroundGrey">#EFEFEF</color>
     <color name="lightGrey">#809197A3</color>
     <color name="blackOverlay">#66000000</color>

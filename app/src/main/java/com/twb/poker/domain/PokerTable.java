@@ -71,6 +71,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         this.deckCardPointer = 0;
         this.deckOfCards = DeckOfCardsFactory.getCards(true);
         callback.onUpdatePlayersOnTable(this);
+        callback.onEvent("New Round Started");
     }
 
     private void resetBets() {
@@ -333,13 +334,13 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             pokerPlayer.setBetCount(INITIAL_BET_COUNT);
             pokerPlayer.setFolded(true);
             callback.onPlayerFold(pokerPlayer);
-            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " folded");
+            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " folded");
             return;
         }
         pot.setCurrentBetType(type);
         if (type == BetType.CHECK) {
             pokerPlayer.setBetCount(INITIAL_BET_COUNT);
-            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " checked");
+            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " checked");
             return;
         }
         if (amount != null) {
@@ -349,17 +350,16 @@ public class PokerTable extends ArrayList<PokerPlayer> {
 
             pot.setCurrentBet(amount);
             pot.setPot(pot.getPot() + amount);
-            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " increased pot by " + amount);
         }
         if (type == BetType.BET) {
             pokerPlayer.setBetCount(pokerPlayer.getBetCount() + BET_COUNT_AMOUNT);
-            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " bet " + amount);
+            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " bet " + amount);
         } else if (type == BetType.RAISE) {
             pokerPlayer.setBetCount(pokerPlayer.getBetCount() + RAISE_COUNT_AMOUNT);
-            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " raised by " + amount);
+            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " raised by " + amount);
         } else if (type == BetType.CALL) {
             pokerPlayer.setBetCount(INITIAL_BET_COUNT);
-            Log.e(TAG, pokerPlayer.getPlayerUser().getDisplayName() + " called " + amount);
+            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " called " + amount);
         }
     }
 
@@ -379,5 +379,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         void onPlayerDealer(PokerPlayer pokerPlayer, boolean dealer);
 
         void onPlayerFold(PokerPlayer pokerPlayer);
+
+        void onEvent(String event);
     }
 }
