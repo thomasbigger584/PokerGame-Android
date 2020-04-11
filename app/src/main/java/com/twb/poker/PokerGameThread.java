@@ -187,16 +187,12 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
         gameDelaySleep();
     }
 
-    void setTurnButtonPressed() {
-        turnButtonPressed = true;
-    }
-
     void setEvalWaitingOnUserInput() {
         evalWaitingOnUserInput = false;
     }
 
     void checkCurrentPlayer() {
-        setTurnButtonPressed();
+        turnButtonPressed = true;
         PokerPlayer pokerPlayer = pokerTable.getCurrentPlayer();
         UI.post(() -> {
             callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " checked");
@@ -204,8 +200,8 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     }
 
     void foldCurrentPlayer() {
+        this.turnButtonPressed = true;
         pokerTable.foldCurrentPlayer();
-        setTurnButtonPressed();
     }
 
     private int calculatePercentage(double secondsLeft) {
@@ -222,12 +218,12 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     }
 
     void onAmountSelected(BetType type, double amount) {
+        this.turnButtonPressed = true;
         PokerPlayer pokerPlayer = pokerTable.getCurrentPlayer();
         if (pokerPlayer == null) {
             return;
         }
         pokerTable.setBetAmount(pokerPlayer, type, amount);
-        setTurnButtonPressed();
     }
 
     @MainThread

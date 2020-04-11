@@ -1,8 +1,6 @@
 package com.twb.poker.domain;
 
 
-import android.util.Log;
-
 import com.twb.poker.util.GenerateUtil;
 
 import java.util.ArrayList;
@@ -329,7 +327,6 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     }
 
     public void setBetAmount(PokerPlayer pokerPlayer, BetType type, Double amount) {
-        Log.e(TAG, "");
         if (type == BetType.FOLD) {
             pokerPlayer.setBetCount(INITIAL_BET_COUNT);
             pokerPlayer.setFolded(true);
