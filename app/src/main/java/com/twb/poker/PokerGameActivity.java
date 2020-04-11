@@ -45,6 +45,10 @@ public class PokerGameActivity extends AppCompatActivity
 
     private CardPairLayout[] cardPairLayouts = new CardPairLayout[6];
     private ChatBoxRecyclerAdapter chatBoxAdapter;
+    private Button checkButton;
+    private Button foldButton;
+    private Button betButton;
+    private Button raiseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,18 +68,18 @@ public class PokerGameActivity extends AppCompatActivity
         chatBoxRecyclerView = pokerGameLinearLayout.findViewById(R.id.chatBoxRecyclerView);
         setupChatBoxRecyclerView();
 
-        final Button checkButton = controlsGridLayout.findViewById(R.id.checkButton);
+        checkButton = controlsGridLayout.findViewById(R.id.checkButton);
         checkButton.setOnClickListener(v -> {
             pokerGameThread.checkCurrentPlayer();
         });
-        final Button foldButton = controlsGridLayout.findViewById(R.id.foldButton);
+        foldButton = controlsGridLayout.findViewById(R.id.foldButton);
         foldButton.setOnClickListener(v -> {
             pokerGameThread.foldCurrentPlayer();
         });
-        final Button betButton = controlsGridLayout.findViewById(R.id.betButton);
+        betButton = controlsGridLayout.findViewById(R.id.betButton);
         betButton.setOnClickListener(v -> showBetDialog());
 
-        final Button raiseButton = controlsGridLayout.findViewById(R.id.raiseButton);
+        raiseButton = controlsGridLayout.findViewById(R.id.raiseButton);
         raiseButton.setOnClickListener(v -> {
             showRaiseDialog();
         });
@@ -174,7 +178,31 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     @Override
-    public void onControlsShow(PokerPlayer pokerPlayer) {
+    public void onControlsShow(List<BetType> betTypes) {
+        checkButton.setVisibility(View.GONE);
+        foldButton.setVisibility(View.GONE);
+        betButton.setVisibility(View.GONE);
+        raiseButton.setVisibility(View.GONE);
+        for (BetType betType : betTypes) {
+            switch (betType) {
+                case CHECK: {
+                    checkButton.setVisibility(View.VISIBLE);
+                    break;
+                }
+                case FOLD: {
+                    foldButton.setVisibility(View.VISIBLE);
+                    break;
+                }
+                case BET: {
+                    betButton.setVisibility(View.VISIBLE);
+                    break;
+                }
+                case RAISE: {
+                    raiseButton.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        }
         controlsGridLayout.setVisibility(View.VISIBLE);
         secondsLeftProgressBar.setVisibility(View.VISIBLE);
     }

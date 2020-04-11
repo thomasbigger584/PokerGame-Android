@@ -66,8 +66,10 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         reset();
         resetBets();
         reassignPokerTableForDealer();
+
         this.deckCardPointer = 0;
         this.deckOfCards = DeckOfCardsFactory.getCards(true);
+
         callback.onUpdatePlayersOnTable(this);
         callback.onEvent("New Round Started");
     }
@@ -112,7 +114,9 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             }
             setTurnPlayer(thisPokerPlayer, true);
             if (thisPokerPlayer.isCurrentPlayer()) {
-                callback.onCurrentPlayerBetTurn(thisPokerPlayer);
+
+                List<BetType> nextBetTypes = getNextBetTypesForCurrent();
+                callback.onCurrentPlayerBetTurn(nextBetTypes);
             } else {
                 callback.onOtherPlayerBetTurn(thisPokerPlayer);
                 performAiPlayerBet(thisPokerPlayer);
@@ -123,13 +127,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     }
 
     private void performAiPlayerBet(PokerPlayer pokerPlayer) {
-        BetType previousBetType = pot.getCurrentBetType();
-        BetType nextBetType;
-        if (previousBetType != null) {
-            nextBetType = previousBetType.getRandomAiBetType();
-        } else {
-            nextBetType = BetType.getInitialBetType();
-        }
+        BetType nextBetType = getNextBetTypeForAi();
         if (nextBetType.isNonPayable()) {
             setBetAmount(pokerPlayer, nextBetType);
         } else {
@@ -138,6 +136,22 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             double randomBet = GenerateUtil.generateAiBet(minimumBet, playerBank.getFunds());
             setBetAmount(pokerPlayer, nextBetType, randomBet);
         }
+    }
+
+    private List<BetType> getNextBetTypesForCurrent() {
+        BetType thisBetType = pot.getCurrentBetType();
+        if (thisBetType != null) {
+            return thisBetType.getNextBetTypeOptions();
+        }
+        return BetType.getInitialBetTypeOptions();
+    }
+
+    private BetType getNextBetTypeForAi() {
+        BetType thisBetType = pot.getCurrentBetType();
+        if (thisBetType != null) {
+            return thisBetType.getRandomAiNextBetType();
+        }
+        return BetType.getInitialAiBetType();
     }
 
     public void flopDeal() {
@@ -358,12 +372,13 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             pokerPlayer.setBetCount(INITIAL_BET_COUNT);
             callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " called " + amount);
         }
+        callback.onEvent(pot.toString());
     }
 
     public interface PokerTableCallback {
         void onUpdatePlayersOnTable(PokerTable pokerTable);
 
-        void onCurrentPlayerBetTurn(PokerPlayer pokerPlayer);
+        void onCurrentPlayerBetTurn(List<BetType> betTypes);
 
         void onOtherPlayerBetTurn(PokerPlayer pokerPlayer);
 

@@ -111,11 +111,12 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     }
 
     @Override
-    public void onCurrentPlayerBetTurn(PokerPlayer pokerPlayer) {
+    public void onCurrentPlayerBetTurn(List<BetType> betTypes) {
         UI.post(() -> {
             callback.onAlert();
-            callback.onControlsShow(pokerPlayer);
+            callback.onControlsShow(betTypes);
         });
+
         turnButtonPressed = false;
         for (double turnSecondsLeft = PLAYER_RESPONSE_TIME_IN_SECONDS; turnSecondsLeft >= 0;
              turnSecondsLeft = turnSecondsLeft - PLAYER_RESPONSE_LOOP_IN_SECONDS) {
@@ -230,7 +231,7 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     public interface PokerGameThreadCallback {
         void onAlert();
 
-        void onControlsShow(PokerPlayer pokerPlayer);
+        void onControlsShow(List<BetType> betTypes);
 
         void onControlsHide();
 
