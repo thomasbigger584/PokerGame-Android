@@ -5,7 +5,7 @@
     <!-- This is the stroke you want to define -->
     <stroke
         android:width="3dp"
-        android:color="@color/orange" />
+        android:color="@color/colorOverlay" />
 
     <!-- Optional, round your corners -->
     <corners
