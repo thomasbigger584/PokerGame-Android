@@ -80,6 +80,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         }
         pot = new Pot();
         pot.setPot(0d);
+        pot.setCurrentBet(0d);
     }
 
     public void initDeal() {
@@ -118,6 +119,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
                 List<BetType> nextBetTypes = getNextBetTypesForCurrent();
                 callback.onCurrentPlayerBetTurn(nextBetTypes);
             } else {
+
                 callback.onOtherPlayerBetTurn(thisPokerPlayer);
                 performAiPlayerBet(thisPokerPlayer);
             }
@@ -178,7 +180,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     }
 
     private Card getCard() {
-        final Card card = deckOfCards.get(deckCardPointer);
+        Card card = deckOfCards.get(deckCardPointer);
         deckCardPointer++;
         return card;
     }
@@ -359,20 +361,26 @@ public class PokerTable extends ArrayList<PokerPlayer> {
             PlayerBank playerBank = playerUser.getBank();
             playerBank.setFunds(playerBank.getFunds() - amount);
 
-            pot.setCurrentBet(amount);
             pot.setPot(pot.getPot() + amount);
+
+            if (type == BetType.BET) {
+                pot.setCurrentBet(amount);
+
+                pokerPlayer.setBetCount(pokerPlayer.getBetCount() + BET_COUNT_AMOUNT);
+                callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " bet " + amount);
+            } else if (type == BetType.RAISE) {
+                pot.setCurrentBet(pot.getCurrentBet() + amount);
+
+                pokerPlayer.setBetCount(pokerPlayer.getBetCount() + RAISE_COUNT_AMOUNT);
+                callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " raised by " + amount);
+            } else if (type == BetType.CALL) {
+                pot.setCurrentBet(amount);
+
+                pokerPlayer.setBetCount(INITIAL_BET_COUNT);
+                callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " called " + amount);
+            }
+            callback.onEvent("Pot: " + pot.getPot() + " " + pot.getCurrentBet());
         }
-        if (type == BetType.BET) {
-            pokerPlayer.setBetCount(pokerPlayer.getBetCount() + BET_COUNT_AMOUNT);
-            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " bet " + amount);
-        } else if (type == BetType.RAISE) {
-            pokerPlayer.setBetCount(pokerPlayer.getBetCount() + RAISE_COUNT_AMOUNT);
-            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " raised by " + amount);
-        } else if (type == BetType.CALL) {
-            pokerPlayer.setBetCount(INITIAL_BET_COUNT);
-            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " called " + amount);
-        }
-        callback.onEvent(pot.toString());
     }
 
     public interface PokerTableCallback {
