@@ -195,9 +195,7 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     void checkCurrentPlayer() {
         turnButtonPressed = true;
         PokerPlayer pokerPlayer = pokerTable.getCurrentPlayer();
-        UI.post(() -> {
-            callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " checked");
-        });
+        pokerTable.setBetAmount(pokerPlayer, BetType.CHECK);
     }
 
     void foldCurrentPlayer() {

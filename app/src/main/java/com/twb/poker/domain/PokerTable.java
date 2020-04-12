@@ -338,7 +338,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         }
     }
 
-    private void setBetAmount(PokerPlayer pokerPlayer, BetType type) {
+    public void setBetAmount(PokerPlayer pokerPlayer, BetType type) {
         setBetAmount(pokerPlayer, type, null);
     }
 
