@@ -103,29 +103,27 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     }
 
     public void performPlayerBetTurn() {
+        do {
+            for (int index = 0; index < size(); index++) {
+                PokerPlayer prevPokerPlayer = getPrevious(index);
+                PokerPlayer thisPokerPlayer = get(index);
+                setTurnPlayer(prevPokerPlayer, false);
+                if (thisPokerPlayer.isFolded()) {
+                    continue;
+                }
+                setTurnPlayer(thisPokerPlayer, true);
+                if (thisPokerPlayer.isCurrentPlayer()) {
 
-//        while (isMorePlayersToBet()) {
+                    List<BetType> nextBetTypes = getNextBetTypesForCurrent();
+                    callback.onCurrentPlayerBetTurn(nextBetTypes);
+                } else {
 
-        for (int index = 0; index < size(); index++) {
-            PokerPlayer prevPokerPlayer = getPrevious(index);
-            PokerPlayer thisPokerPlayer = get(index);
-            setTurnPlayer(prevPokerPlayer, false);
-            if (thisPokerPlayer.isFolded()) {
-                continue;
+                    callback.onOtherPlayerBetTurn(thisPokerPlayer);
+                    performAiPlayerBet(thisPokerPlayer);
+                }
             }
-            setTurnPlayer(thisPokerPlayer, true);
-            if (thisPokerPlayer.isCurrentPlayer()) {
-
-                List<BetType> nextBetTypes = getNextBetTypesForCurrent();
-                callback.onCurrentPlayerBetTurn(nextBetTypes);
-            } else {
-
-                callback.onOtherPlayerBetTurn(thisPokerPlayer);
-                performAiPlayerBet(thisPokerPlayer);
-            }
-        }
-        setTurnPlayer(get(size() - 1), false);
-//        }
+            setTurnPlayer(get(size() - 1), false);
+        } while (isMorePlayersToBet());
     }
 
     private void performAiPlayerBet(PokerPlayer pokerPlayer) {
