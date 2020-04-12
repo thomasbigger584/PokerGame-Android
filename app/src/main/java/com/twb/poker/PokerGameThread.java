@@ -4,6 +4,7 @@ import android.os.Handler;
 
 import androidx.annotation.MainThread;
 
+import com.twb.poker.domain.Bet;
 import com.twb.poker.domain.BetType;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
@@ -216,13 +217,13 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
         return playerUser.getBank();
     }
 
-    void onAmountSelected(BetType type, double amount) {
+    void onBetSelected(Bet bet) {
         this.turnButtonPressed = true;
         PokerPlayer pokerPlayer = pokerTable.getCurrentPlayer();
         if (pokerPlayer == null) {
             return;
         }
-        pokerTable.setBetAmount(pokerPlayer, type, amount);
+        pokerTable.setBetAmount(pokerPlayer, bet);
     }
 
     @MainThread

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.twb.poker.chatbox.ChatBoxRecyclerAdapter;
+import com.twb.poker.domain.Bet;
 import com.twb.poker.domain.BetType;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
@@ -284,7 +285,7 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAmountSelected(BetType type, double amount) {
-        pokerGameThread.onAmountSelected(type, amount);
+    public void onBetSelected(Bet bet) {
+        pokerGameThread.onBetSelected(bet);
     }
 }

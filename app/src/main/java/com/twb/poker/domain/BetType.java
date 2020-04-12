@@ -53,21 +53,26 @@ public enum BetType {
         switch (betType) {
             case CHECK: {
                 nextBetTypes.
-                        add(80, CHECK).
-                        add(20, BET);
+                        add(60, CHECK).
+                        add(40, BET);
                 break;
             }
             case CALL: {
+//                nextBetTypes.
+//                        add(70, CALL).
+//                        add(20, RAISE).
+//                        add(10, FOLD);
                 nextBetTypes.
-                        add(70, CALL).
-                        add(20, RAISE).
-                        add(10, FOLD);
+                        add(80, CALL).
+                        add(20, RAISE);
                 break;
             }
             case RAISE: {
+//                nextBetTypes.
+//                        add(70, CALL).
+//                        add(30, FOLD);
                 nextBetTypes.
-                        add(70, CALL).
-                        add(30, FOLD);
+                        add(100, CALL);
                 break;
             }
             default: {

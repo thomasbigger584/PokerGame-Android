@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.twb.poker.R;
+import com.twb.poker.domain.Bet;
 import com.twb.poker.domain.BetType;
 import com.twb.poker.util.SeekBarChangeListenerBase;
 
@@ -53,12 +54,14 @@ public class BetRaiseDialog extends PokerDialog {
         Button successButton = inflatedView.findViewById(R.id.successButton);
         successButton.setOnClickListener(v -> {
             if (betRaiseListener != null) {
-                betRaiseListener.onAmountSelected(type, amountSelected);
+                Bet bet = new Bet();
+                bet.setBetType(type);
+                bet.setBetAmount(amountSelected);
+                betRaiseListener.onBetSelected(bet);
             }
         });
 
         setSeekBar(playerCurrentFunds);
-
         return inflatedView;
     }
 
@@ -95,6 +98,6 @@ public class BetRaiseDialog extends PokerDialog {
     }
 
     public interface BetRaiseClickListener {
-        void onAmountSelected(BetType type, double amount);
+        void onBetSelected(Bet bet);
     }
 }
