@@ -91,34 +91,59 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         }
     }
 
-
     public void performPlayerBetTurn() {
-        for (int index = 0; index < size(); index++) {
-            PokerPlayer prevPokerPlayer = getPrevious(index);
-            PokerPlayer thisPokerPlayer = get(index);
-            setTurnPlayer(prevPokerPlayer, false);
-            if (thisPokerPlayer.isFolded()) {
-                continue;
-            }
-            setTurnPlayer(thisPokerPlayer, true);
-            if (thisPokerPlayer.isCurrentPlayer()) {
+        pot.clearForPlayerRound();
 
-                List<BetType> nextBetTypes = getNextBetTypesForCurrent();
-                callback.onCurrentPlayerBetTurn(nextBetTypes);
-            } else {
+        do {
+            for (int index = 0; index < size(); index++) {
 
-                callback.onOtherPlayerBetTurn(thisPokerPlayer);
-                performAiPlayerBet(thisPokerPlayer);
+                PokerPlayer prevPokerPlayer = getPrevious(index);
+                PokerPlayer thisPokerPlayer = get(index);
+                setTurnPlayer(prevPokerPlayer, false);
+                if (thisPokerPlayer.isFolded()) {
+                    continue;
+                }
+                setTurnPlayer(thisPokerPlayer, true);
+                if (thisPokerPlayer.isCurrentPlayer()) {
+
+                    BetAmountRequest betAmountRequest = new BetAmountRequest();
+                    betAmountRequest.setBetTypes(getNextBetTypesForCurrent());
+                    Bet currentBet = pot.getCurrentBet();
+                    if (currentBet != null) {
+                        betAmountRequest.setAmount(currentBet.getBetAmount());
+                    }
+
+                    callback.onCurrentPlayerBetTurn(betAmountRequest);
+
+                } else {
+
+                    callback.onOtherPlayerBetTurn(thisPokerPlayer);
+                    performAiPlayerBet(thisPokerPlayer);
+                }
+
+                if (pot.isAllPlayersPaidUp(getTableSize())) {
+                    break;
+                }
             }
-        }
-        setTurnPlayer(get(size() - 1), false);
+            setTurnPlayer(get(size() - 1), false);
+
+        } while (!pot.isAllPlayersPaidUp(getTableSize()));
+
     }
 
     private void performAiPlayerBet(PokerPlayer pokerPlayer) {
         Bet bet = new Bet();
         bet.setBetType(getNextBetTypeForAi());
-
-        if (!bet.getBetType().isNonPayable()) {
+        if (bet.getBetType() == BetType.CALL) {
+            double currentBetAmount = pot.getCurrentBet().getBetAmount();
+            bet.setBetAmount(currentBetAmount);
+        } else if (bet.getBetType() == BetType.RAISE) {
+            double currentBetAmount = pot.getCurrentBet().getBetAmount();
+            PlayerUser playerUser = pokerPlayer.getPlayerUser();
+            PlayerBank playerBank = playerUser.getBank();
+            double randomRaise = GenerateUtil.generateAiBet(currentBetAmount, playerBank.getFunds());
+            bet.setBetAmount(randomRaise);
+        } else if (bet.getBetType() == BetType.BET) {
             PlayerUser playerUser = pokerPlayer.getPlayerUser();
             PlayerBank playerBank = playerUser.getBank();
             double randomBet = GenerateUtil.generateAiBet(minimumBet, playerBank.getFunds());
@@ -128,17 +153,23 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     }
 
     private List<BetType> getNextBetTypesForCurrent() {
-        BetType betType = pot.getCurrentBet().getBetType();
-        if (betType != null) {
-            return betType.getNextBetTypeOptions();
+        Bet currentBet = pot.getCurrentBet();
+        if (currentBet != null) {
+            BetType betType = currentBet.getBetType();
+            if (betType != null) {
+                return betType.getNextBetTypeOptions();
+            }
         }
         return BetType.getInitialBetTypeOptions();
     }
 
     private BetType getNextBetTypeForAi() {
-        BetType betType = pot.getCurrentBet().getBetType();
-        if (betType != null) {
-            return betType.getRandomAiNextBetType();
+        Bet currentBet = pot.getCurrentBet();
+        if (currentBet != null) {
+            BetType betType = currentBet.getBetType();
+            if (betType != null) {
+                return betType.getRandomAiNextBetType();
+            }
         }
         return BetType.getInitialAiBetType();
     }
@@ -317,6 +348,21 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         }
     }
 
+    private boolean isLastPokerPlayerStanding() {
+        int tableSizeNotFolded = getTableSize();
+        return tableSizeNotFolded == 1;
+    }
+
+    private int getTableSize() {
+        int count = 0;
+        for (PokerPlayer pokerPlayer : this) {
+            if (!pokerPlayer.isFolded()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private void reset() {
         pot = new Pot();
         communityCards.clear();
@@ -344,6 +390,9 @@ public class PokerTable extends ArrayList<PokerPlayer> {
                 callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " checked");
                 break;
             }
+            case CALL: {
+                callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " called " + bet.getBetAmount());
+            }
             case BET: {
                 callback.onEvent(pokerPlayer.getPlayerUser().getDisplayName() + " bet " + bet.getBetAmount());
                 break;
@@ -359,7 +408,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     public interface PokerTableCallback {
         void onUpdatePlayersOnTable(PokerTable pokerTable);
 
-        void onCurrentPlayerBetTurn(List<BetType> betTypes);
+        void onCurrentPlayerBetTurn(BetAmountRequest betAmountRequest);
 
         void onOtherPlayerBetTurn(PokerPlayer pokerPlayer);
 

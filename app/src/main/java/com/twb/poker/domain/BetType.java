@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 public enum BetType {
-    ANTE, BLIND, CHECK, CALL, BET, FOLD, RAISE;
-
+    CHECK, CALL, BET, FOLD, RAISE;
+    private static final String TAG = BetType.class.getSimpleName();
 
     public static BetType getInitialAiBetType() {
         WeightedRandomCollection<BetType> initialBetTypes = new WeightedRandomCollection<>();
@@ -57,6 +57,7 @@ public enum BetType {
                         add(40, BET);
                 break;
             }
+            case BET:
             case CALL: {
 //                nextBetTypes.
 //                        add(70, CALL).
@@ -74,10 +75,6 @@ public enum BetType {
                 nextBetTypes.
                         add(100, CALL);
                 break;
-            }
-            default: {
-                nextBetTypes.
-                        add(100, FOLD);
             }
         }
         return nextBetTypes.next();

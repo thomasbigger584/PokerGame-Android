@@ -5,6 +5,7 @@ import android.os.Handler;
 import androidx.annotation.MainThread;
 
 import com.twb.poker.domain.Bet;
+import com.twb.poker.domain.BetAmountRequest;
 import com.twb.poker.domain.BetType;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
@@ -112,10 +113,10 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     }
 
     @Override
-    public void onCurrentPlayerBetTurn(List<BetType> betTypes) {
+    public void onCurrentPlayerBetTurn(BetAmountRequest betAmountRequest) {
         UI.post(() -> {
             callback.onAlert();
-            callback.onControlsShow(betTypes);
+            callback.onControlsShow(betAmountRequest);
         });
 
         turnButtonPressed = false;
@@ -230,7 +231,7 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     public interface PokerGameThreadCallback {
         void onAlert();
 
-        void onControlsShow(List<BetType> betTypes);
+        void onControlsShow(BetAmountRequest betAmountRequest);
 
         void onControlsHide();
 

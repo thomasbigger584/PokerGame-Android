@@ -12,6 +12,9 @@ public class Bet {
     @NotNull
     @Override
     public String toString() {
+        if (betAmount == null) {
+            return "Bet{betType=" + betType + "}";
+        }
         return "Bet{" +
                 "betAmount=" + betAmount +
                 ", betType=" + betType +

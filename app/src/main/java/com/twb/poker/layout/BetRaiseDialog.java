@@ -16,7 +16,6 @@ import com.twb.poker.domain.Bet;
 import com.twb.poker.domain.BetType;
 import com.twb.poker.util.SeekBarChangeListenerBase;
 
-import java.math.BigDecimal;
 import java.util.Locale;
 
 public class BetRaiseDialog extends PokerDialog {
@@ -92,9 +91,8 @@ public class BetRaiseDialog extends PokerDialog {
     }
 
     private double round(double amount) {
-        BigDecimal bd = new BigDecimal(Double.toString(amount));
-        bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-        return bd.doubleValue();
+        String amountStr = String.format(Locale.getDefault(), "%.2f", amount);
+        return Double.valueOf(amountStr);
     }
 
     public interface BetRaiseClickListener {

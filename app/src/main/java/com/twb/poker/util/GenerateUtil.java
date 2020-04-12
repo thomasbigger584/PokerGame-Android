@@ -2,8 +2,7 @@ package com.twb.poker.util;
 
 import com.github.javafaker.Faker;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.Locale;
 import java.util.Random;
 
 public class GenerateUtil {
@@ -18,8 +17,8 @@ public class GenerateUtil {
     public static double generateRandomFunds(int rangeMin, int rangeMax) {
         Random r = new Random();
         double funds = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
-        BigDecimal bd = new BigDecimal(funds).setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();
+        String fundsStr = String.format(Locale.getDefault(), "%.2f", funds);
+        return Double.valueOf(fundsStr);
     }
 
     public static double generateAiBet(double min, double max) {
@@ -32,7 +31,7 @@ public class GenerateUtil {
         }
         Random r = new Random();
         double funds = newMin + (newMax - newMin) * r.nextDouble();
-        BigDecimal bd = new BigDecimal(funds).setScale(2, RoundingMode.HALF_UP);
-        return bd.doubleValue();
+        String fundsStr = String.format(Locale.getDefault(), "%.2f", funds);
+        return Double.valueOf(fundsStr);
     }
 }

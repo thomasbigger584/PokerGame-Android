@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.twb.poker.chatbox.ChatBoxRecyclerAdapter;
 import com.twb.poker.domain.Bet;
+import com.twb.poker.domain.BetAmountRequest;
 import com.twb.poker.domain.BetType;
 import com.twb.poker.domain.Card;
 import com.twb.poker.domain.CommunityCardType;
@@ -179,12 +180,14 @@ public class PokerGameActivity extends AppCompatActivity
     }
 
     @Override
-    public void onControlsShow(List<BetType> betTypes) {
+    public void onControlsShow(BetAmountRequest betAmountRequest) {
         checkButton.setVisibility(View.GONE);
         foldButton.setVisibility(View.GONE);
         betButton.setVisibility(View.GONE);
         raiseButton.setVisibility(View.GONE);
-        for (BetType betType : betTypes) {
+
+        //todo: amount returned should be the restriction of betting
+        for (BetType betType : betAmountRequest.getBetTypes()) {
             switch (betType) {
                 case CHECK: {
                     checkButton.setVisibility(View.VISIBLE);
