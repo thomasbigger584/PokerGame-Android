@@ -3,6 +3,8 @@ package com.twb.poker.domain;
 
 import com.twb.poker.util.GenerateUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,6 +21,7 @@ import static com.twb.poker.util.GenerateUtil.generateRandomName;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PokerTable extends ArrayList<PokerPlayer> {
+    private static final double MINIMUM_BET = 20d;
     private static final Logger LOGGER = Logger.getLogger(PokerTable.class.getSimpleName());
     private static final int NO_CARDS_FOR_PLAYER_DEAL = 2;
     private static final int NO_DEALER = -1;
@@ -31,7 +34,6 @@ public class PokerTable extends ArrayList<PokerPlayer> {
     private List<Card> deckOfCards;
     private int deckCardPointer;
     private Pot pot;
-    private double minimumBet = 50d;
 
     public PokerTable(PokerTableCallback callback) {
         this.callback = callback;
@@ -106,13 +108,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
                 setTurnPlayer(thisPokerPlayer, true);
                 if (thisPokerPlayer.isCurrentPlayer()) {
 
-                    BetAmountRequest betAmountRequest = new BetAmountRequest();
-                    betAmountRequest.setBetTypes(getNextBetTypesForCurrent());
-                    Bet currentBet = pot.getCurrentBet();
-                    if (currentBet != null) {
-                        betAmountRequest.setAmount(currentBet.getBetAmount());
-                    }
-
+                    BetAmountRequest betAmountRequest = getBetAmountRequest();
                     callback.onCurrentPlayerBetTurn(betAmountRequest);
 
                 } else {
@@ -131,6 +127,19 @@ public class PokerTable extends ArrayList<PokerPlayer> {
 
     }
 
+    @NotNull
+    private BetAmountRequest getBetAmountRequest() {
+        BetAmountRequest betAmountRequest = new BetAmountRequest();
+        betAmountRequest.setBetTypes(getNextBetTypesForCurrent());
+        Bet currentBet = pot.getCurrentBet();
+        if (currentBet != null) {
+            betAmountRequest.setAmount(currentBet.getBetAmount());
+        } else {
+            betAmountRequest.setAmount(MINIMUM_BET);
+        }
+        return betAmountRequest;
+    }
+
     private void performAiPlayerBet(PokerPlayer pokerPlayer) {
         Bet bet = new Bet();
         bet.setBetType(getNextBetTypeForAi());
@@ -146,7 +155,7 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         } else if (bet.getBetType() == BetType.BET) {
             PlayerUser playerUser = pokerPlayer.getPlayerUser();
             PlayerBank playerBank = playerUser.getBank();
-            double randomBet = GenerateUtil.generateAiBet(minimumBet, playerBank.getFunds());
+            double randomBet = GenerateUtil.generateAiBet(MINIMUM_BET, playerBank.getFunds());
             bet.setBetAmount(randomBet);
         }
         setBetAmount(pokerPlayer, bet);
@@ -320,6 +329,17 @@ public class PokerTable extends ArrayList<PokerPlayer> {
         PokerPlayer currentPlayer = getCurrentPlayer();
         if (currentPlayer != null) {
             setBetAmount(currentPlayer, BetType.FOLD);
+        }
+    }
+
+    public void callCurrentPlayer() {
+        PokerPlayer currentPlayer = getCurrentPlayer();
+        if (currentPlayer != null) {
+            double betAmount = pot.getCurrentBet().getBetAmount();
+            Bet bet = new Bet();
+            bet.setBetType(BetType.CALL);
+            bet.setBetAmount(betAmount);
+            setBetAmount(currentPlayer, bet);
         }
     }
 

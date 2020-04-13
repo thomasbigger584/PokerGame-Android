@@ -27,6 +27,7 @@ import static com.twb.poker.util.SleepUtil.playerTurnSleep;
 import static com.twb.poker.util.SleepUtil.roundDelaySleep;
 
 public class PokerGameThread extends Thread implements PokerTable.PokerTableCallback {
+    private static final String TAG = PokerGameThread.class.getSimpleName();
     private static final Handler UI = new Handler();
 
     private static final int PLAYER_RESPONSE_TIME_IN_SECONDS = 30;
@@ -203,6 +204,11 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     void foldCurrentPlayer() {
         this.turnButtonPressed = true;
         pokerTable.foldCurrentPlayer();
+    }
+
+    void callCurrentPlayer() {
+        this.turnButtonPressed = true;
+        pokerTable.callCurrentPlayer();
     }
 
     private int calculatePercentage(double secondsLeft) {

@@ -7,7 +7,6 @@ import android.os.Vibrator;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -34,12 +33,12 @@ import java.util.List;
 
 public class PokerGameActivity extends AppCompatActivity
         implements PokerGameThread.PokerGameThreadCallback, BetRaiseDialog.BetRaiseClickListener {
+    private static final String TAG = PokerGameActivity.class.getSimpleName();
     private static final int VIBRATE_LENGTH_IN_MS = 500;
 
     private PokerGameThread pokerGameThread;
 
     private LinearLayout pokerGameLinearLayout;
-    private GridLayout controlsGridLayout;
     private RecyclerView chatBoxRecyclerView;
     private CommunityCardLayout communityCardLayout;
     private PokerDialog pokerDialog;
@@ -51,6 +50,8 @@ public class PokerGameActivity extends AppCompatActivity
     private Button foldButton;
     private Button betButton;
     private Button raiseButton;
+    private BetAmountRequest currentBetAmountRequest;
+    private Button callButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,22 +67,25 @@ public class PokerGameActivity extends AppCompatActivity
         cardPairLayouts[4] = pokerGameLinearLayout.findViewById(R.id.tablePlayer4CardPairLayout);
         cardPairLayouts[5] = pokerGameLinearLayout.findViewById(R.id.tablePlayer5CardPairLayout);
         communityCardLayout = findViewById(R.id.communityCardLayout);
-        controlsGridLayout = findViewById(R.id.controlsGridLayout);
+        LinearLayout controlsLinearLayout = findViewById(R.id.controlsLinearLayout);
         chatBoxRecyclerView = pokerGameLinearLayout.findViewById(R.id.chatBoxRecyclerView);
         setupChatBoxRecyclerView();
 
-        checkButton = controlsGridLayout.findViewById(R.id.checkButton);
+        checkButton = controlsLinearLayout.findViewById(R.id.checkButton);
         checkButton.setOnClickListener(v -> {
             pokerGameThread.checkCurrentPlayer();
         });
-        foldButton = controlsGridLayout.findViewById(R.id.foldButton);
+        callButton = controlsLinearLayout.findViewById(R.id.callButton);
+        callButton.setOnClickListener(v -> {
+            pokerGameThread.callCurrentPlayer();
+        });
+        betButton = controlsLinearLayout.findViewById(R.id.betButton);
+        betButton.setOnClickListener(v -> showBetDialog());
+        foldButton = controlsLinearLayout.findViewById(R.id.foldButton);
         foldButton.setOnClickListener(v -> {
             pokerGameThread.foldCurrentPlayer();
         });
-        betButton = controlsGridLayout.findViewById(R.id.betButton);
-        betButton.setOnClickListener(v -> showBetDialog());
-
-        raiseButton = controlsGridLayout.findViewById(R.id.raiseButton);
+        raiseButton = controlsLinearLayout.findViewById(R.id.raiseButton);
         raiseButton.setOnClickListener(v -> {
             showRaiseDialog();
         });
@@ -181,44 +185,60 @@ public class PokerGameActivity extends AppCompatActivity
 
     @Override
     public void onControlsShow(BetAmountRequest betAmountRequest) {
-        checkButton.setVisibility(View.GONE);
-        foldButton.setVisibility(View.GONE);
-        betButton.setVisibility(View.GONE);
-        raiseButton.setVisibility(View.GONE);
-
-        //todo: amount returned should be the restriction of betting
+        this.currentBetAmountRequest = betAmountRequest;
         for (BetType betType : betAmountRequest.getBetTypes()) {
             switch (betType) {
                 case CHECK: {
-                    checkButton.setVisibility(View.VISIBLE);
+                    setVisible(checkButton);
                     break;
                 }
-                case FOLD: {
-                    foldButton.setVisibility(View.VISIBLE);
+                case CALL: {
+                    setVisible(callButton);
                     break;
                 }
                 case BET: {
-                    betButton.setVisibility(View.VISIBLE);
+                    setVisible(betButton);
                     break;
                 }
                 case RAISE: {
-                    raiseButton.setVisibility(View.VISIBLE);
+                    setVisible(raiseButton);
+                    break;
+                }
+                case FOLD: {
+                    setVisible(foldButton);
                     break;
                 }
             }
         }
-        controlsGridLayout.setVisibility(View.VISIBLE);
-        secondsLeftProgressBar.setVisibility(View.VISIBLE);
+        setVisible(secondsLeftProgressBar);
     }
 
     @Override
     public void onControlsHide() {
         dismissPokerDialog();
-        if (controlsGridLayout.getVisibility() != View.GONE) {
-            controlsGridLayout.setVisibility(View.GONE);
+        setGone(checkButton);
+        setGone(callButton);
+        setGone(foldButton);
+        setGone(betButton);
+        setGone(raiseButton);
+        setInvisible(secondsLeftProgressBar);
+    }
+
+    private void setInvisible(View view) {
+        if (view.getVisibility() != View.INVISIBLE) {
+            view.setVisibility(View.INVISIBLE);
         }
-        if (secondsLeftProgressBar.getVisibility() != View.INVISIBLE) {
-            secondsLeftProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void setGone(View view) {
+        if (view.getVisibility() != View.GONE) {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    private void setVisible(View view) {
+        if (view.getVisibility() != View.VISIBLE) {
+            view.setVisibility(View.VISIBLE);
         }
     }
 
@@ -251,7 +271,8 @@ public class PokerGameActivity extends AppCompatActivity
         PlayerBank playerBank = pokerGameThread.getCurrentBank();
         if (playerBank != null) {
             double funds = playerBank.getFunds();
-            pokerDialog = BetRaiseDialog.newInstance(BetType.BET, funds, this);
+            double minimumBet = currentBetAmountRequest.getAmount();
+            pokerDialog = BetRaiseDialog.newInstance(BetType.BET, funds, minimumBet, this);
             pokerDialog.show(getSupportFragmentManager());
         }
     }
@@ -261,7 +282,8 @@ public class PokerGameActivity extends AppCompatActivity
         PlayerBank playerBank = pokerGameThread.getCurrentBank();
         if (playerBank != null) {
             double funds = playerBank.getFunds();
-            pokerDialog = BetRaiseDialog.newInstance(BetType.RAISE, funds, this);
+            double minimumBet = currentBetAmountRequest.getAmount();
+            pokerDialog = BetRaiseDialog.newInstance(BetType.RAISE, funds, minimumBet, this);
             pokerDialog.show(getSupportFragmentManager());
         }
     }

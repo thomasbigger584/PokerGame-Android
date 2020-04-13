@@ -24,12 +24,14 @@ public class BetRaiseDialog extends PokerDialog {
     private TextView titleTextView;
     private SeekBar betRaiseSeekBar;
     private double playerCurrentFunds;
+    private double minimumBet;
     private double amountSelected;
 
-    public static BetRaiseDialog newInstance(BetType type, double playerCurrentFunds, BetRaiseClickListener listener) {
+    public static BetRaiseDialog newInstance(BetType type, double playerCurrentFunds, double minimumBet, BetRaiseClickListener listener) {
         BetRaiseDialog fragment = new BetRaiseDialog();
         fragment.betRaiseListener = listener;
         fragment.type = type;
+        fragment.minimumBet = minimumBet;
         fragment.playerCurrentFunds = playerCurrentFunds;
         fragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
         Bundle bundle = new Bundle();
@@ -84,10 +86,10 @@ public class BetRaiseDialog extends PokerDialog {
         double seekbarAmount = amount * 100;
         betRaiseSeekBar.setMax((int) seekbarAmount);
 
-        double defaultAmount = seekbarAmount / 10;
-        betRaiseSeekBar.setProgress((int) defaultAmount);
+        double thisMinimumBet = minimumBet * 100;
+        betRaiseSeekBar.setProgress((int) thisMinimumBet);
 
-        setTitleTextView(defaultAmount / 100);
+        setTitleTextView(thisMinimumBet / 100);
     }
 
     private double round(double amount) {
