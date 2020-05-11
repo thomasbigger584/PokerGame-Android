@@ -1,5 +1,7 @@
 package com.twb.poker.domain;
 
+import java.util.List;
+
 /**
  * An immutable class representing a card from a normal 52-card deck.
  */
@@ -70,6 +72,16 @@ public class Card {
      */
     private static boolean isValidSuit(int suit) {
         return suit == CLUBS || suit == DIAMONDS || suit == HEARTS || suit == SPADES;
+    }
+
+    public static Card getCard(int suit, int rank) {
+        List<Card> deckOfCards = DeckOfCardsFactory.getCards(false);
+        for (Card card : deckOfCards) {
+            if (card.getSuit() == suit && card.getRank() == rank) {
+                return card;
+            }
+        }
+        return null;
     }
 
     public String getDrawable() {
