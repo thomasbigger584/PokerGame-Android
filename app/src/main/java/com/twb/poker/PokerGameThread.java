@@ -35,8 +35,8 @@ public class PokerGameThread extends Thread implements PokerTable.PokerTableCall
     private boolean evalWaitingOnUserInput = false;
     private boolean turnButtonPressed = false;
 
-    private PokerTable pokerTable;
-    private PokerGameThreadCallback callback;
+    private final PokerTable pokerTable;
+    private final PokerGameThreadCallback callback;
 
     PokerGameThread(PokerGameThreadCallback callback) {
         setName(PokerGameThread.class.getSimpleName());
